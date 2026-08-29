@@ -612,6 +612,7 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 700; }
     padding: 8px 4px;
   }
   .bottom-nav a.active { color: var(--gold); }
+  body { padding-bottom: 72px; }
 }
 
 @media (max-width: 720px) {
