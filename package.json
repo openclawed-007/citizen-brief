@@ -8,7 +8,8 @@
     "prebuild": "npx tsx scripts/harvest.ts",
     "build": "next build",
     "start": "next start --port ${PORT:-3000}",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "npx tsx scripts/test-site.ts"
   },
   "dependencies": {
     "next": "^15.5.24",

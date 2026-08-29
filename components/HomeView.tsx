@@ -14,6 +14,7 @@ import {
 } from "@/lib/format";
 import { useFeed } from "./FeedProvider";
 import { CardDrawer } from "./RoadmapBoard";
+import { FeatureEntry } from "./FeatureEntry";
 
 export function HomeView() {
   const { feed } = useFeed();
@@ -22,6 +23,13 @@ export function HomeView() {
   const nextRel = roadmap.upcoming[0];
   const lead = news[0];
   const [open, setOpen] = useState<RoadmapCard | null>(null);
+  const needle = live.title.replace(/['"]/g, "").toLowerCase();
+  const leadIndex = Math.max(
+    0,
+    features.findIndex((c) => needle && c.name.toLowerCase().includes(needle.split(" ")[0] || needle)),
+  );
+  const leadFeature = features[leadIndex] || features[0];
+  const rest = features.filter((_, i) => i !== leadIndex);
 
   return (
     <main id="content">
@@ -96,27 +104,19 @@ export function HomeView() {
             <div>
               <p className="eyebrow">Catalog</p>
               <h2>What shipped in {live.version}</h2>
-              <p>Every public roadmap card for the live build. Select a row for the full brief.</p>
+              <p>Each deliverable with its official still. Open one for the full brief.</p>
             </div>
             <Link className="more" href="/roadmap">
               Full roadmap
             </Link>
           </div>
-          {features.map((card, i) => (
-            <button key={card.id} className="cat-row" type="button" onClick={() => setOpen(card)}>
-              <span className="num">{String(i + 1).padStart(2, "0")}</span>
-              <span className="name">{card.name}</span>
-              <span className="meta">{card.category}</span>
-              <span className="status">{card.status}</span>
-            </button>
-          ))}
-          <div className="film">
-            {features
-              .filter((c) => c.image)
-              .slice(0, 3)
-              .map((c) => (
-                <img key={c.id} src={c.image || ""} alt={c.name} />
-              ))}
+          {leadFeature ? (
+            <FeatureEntry card={leadFeature} index={0} featured onOpen={setOpen} />
+          ) : null}
+          <div className="feature-stack">
+            {rest.map((card, i) => (
+              <FeatureEntry key={card.id} card={card} index={i + 1} onOpen={setOpen} />
+            ))}
           </div>
         </div>
       </section>
@@ -136,14 +136,11 @@ export function HomeView() {
                 See all columns
               </Link>
             </div>
-            {nextRel.cards.slice(0, 10).map((card, i) => (
-              <button key={card.id} className="cat-row" type="button" onClick={() => setOpen(card)}>
-                <span className="num">{String(i + 1).padStart(2, "0")}</span>
-                <span className="name">{card.name}</span>
-                <span className="meta">{card.category}</span>
-                <span className="status">{card.status}</span>
-              </button>
-            ))}
+            <div className="feature-stack">
+              {nextRel.cards.slice(0, 10).map((card, i) => (
+                <FeatureEntry key={card.id} card={card} index={i} onOpen={setOpen} />
+              ))}
+            </div>
           </div>
         </section>
       ) : null}

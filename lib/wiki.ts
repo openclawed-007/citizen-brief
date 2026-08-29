@@ -31,8 +31,7 @@ function stripNestedTemplates(input: string): string {
           : `https://robertsspaceindustries.com/${url.replace(/^\//, "")}`;
         return `[${text}](${href})`;
       }
-      const cite = m.match(/\{\{\s*Cite RSI\s*\|[^}]*\}\}/i);
-      if (cite) return "";
+      if (/\{\{\s*Cite RSI\s*\|/i.test(m)) return "";
       return "";
     });
     if (next === s) break;
@@ -41,30 +40,48 @@ function stripNestedTemplates(input: string): string {
   return s;
 }
 
-function wikiLinkToHtml(page: string, label: string): string {
-  const title = page.replace(/ /g, "_");
-  const href = `https://starcitizen.tools/${encodeURIComponent(title).replace(/%2F/g, "/")}`;
-  return `<a href="${href}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a>`;
+function wikiHref(page: string): string {
+  const title = page.replace(/ /g, "_").replace(/#/g, " ");
+  return `https://starcitizen.tools/${encodeURI(title)}`;
 }
 
-function inlineFormat(raw: string): string {
-  let s = raw;
-  s = s.replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, (_, p, l) => wikiLinkToHtml(p, l));
-  s = s.replace(/\[\[([^\]]+)\]\]/g, (_, p) => wikiLinkToHtml(p, p));
-  s = s.replace(/\[([^\s\]]+)\s+([^\]]+)\]/g, (_, url, label) => {
-    const href = url.startsWith("http") ? url : `https://${url}`;
-    return `<a href="${escapeHtml(href)}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a>`;
-  });
-  s = s.replace(
-    /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
-    '<a href="$2" target="_blank" rel="noreferrer">$1</a>',
+function stashHtml(slots: string[], html: string): string {
+  const i = slots.length;
+  slots.push(html);
+  return `\u0000${i}\u0000`;
+}
+
+export function inlineFormat(plain: string): string {
+  const slots: string[] = [];
+  let s = plain.replace(/\[\[File:[^\]]+\]\]/gi, "");
+  s = s.replace(/\[\[([^\]|#]+)(?:#[^\]|]*)?\|([^\]]+)\]\]/g, (_, p, l) =>
+    stashHtml(
+      slots,
+      `<a href="${escapeHtml(wikiHref(p.trim()))}" target="_blank" rel="noreferrer">${escapeHtml(l.trim())}</a>`,
+    ),
   );
+  s = s.replace(/\[\[([^\]|#]+)(?:#[^\]]*)?\]\]/g, (_, p) =>
+    stashHtml(
+      slots,
+      `<a href="${escapeHtml(wikiHref(p.trim()))}" target="_blank" rel="noreferrer">${escapeHtml(p.trim())}</a>`,
+    ),
+  );
+  s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, (_, text, url) =>
+    stashHtml(
+      slots,
+      `<a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(text)}</a>`,
+    ),
+  );
+  s = s.replace(/\[(https?:\/\/[^\s\]]+)\s+([^\]]+)\]/g, (_, url, label) =>
+    stashHtml(
+      slots,
+      `<a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a>`,
+    ),
+  );
+  s = escapeHtml(s);
   s = s.replace(/'''(.+?)'''/g, "<strong>$1</strong>");
   s = s.replace(/''(.+?)''/g, "<em>$1</em>");
-  s = s.replace(/https?:\/\/[^\s<]+/g, (url) => {
-    if (url.includes('href="')) return url;
-    return `<a href="${url}" target="_blank" rel="noreferrer">${url}</a>`;
-  });
+  s = s.replace(/\u0000(\d+)\u0000/g, (_, i) => slots[Number(i)] || "");
   return s;
 }
 
@@ -82,9 +99,7 @@ export function extractPatchMeta(wikitext: string): {
   const get = (key: string) =>
     wikitext.match(new RegExp(`\\|\\s*${key}\\s*=\\s*(.*)`, "i"))?.[1]?.trim() || "";
 
-  const headlineMatch = wikitext.match(
-    /'''Star Citizen Alpha [0-9.]+[^']*'''/i,
-  );
+  const headlineMatch = wikitext.match(/'''Star Citizen Alpha [0-9.]+[^']*'''/i);
   const headline = headlineMatch
     ? decodeEntities(headlineMatch[0].replace(/'''/g, "")).replace(/\s+/g, " ").trim()
     : "";
@@ -102,7 +117,8 @@ export function extractPatchMeta(wikitext: string): {
   let m: RegExpExecArray | null;
   while ((m = linkRe.exec(wikitext))) {
     const body = m[1];
-    const url = body.match(/\|\s*url\s*=\s*([^|]+)/i)?.[1]?.trim() ||
+    const url =
+      body.match(/\|\s*url\s*=\s*([^|]+)/i)?.[1]?.trim() ||
       body.match(/url=([^|]+)/i)?.[1]?.trim() ||
       "";
     const text = body.match(/\|\s*text\s*=\s*([^|]+)/i)?.[1]?.trim() || "";
@@ -122,7 +138,9 @@ export function extractPatchMeta(wikitext: string): {
     headline,
     summary: excerpt(
       decodeEntities(
-        stripNestedTemplates((firstPara || "").replace(/'''/g, "").replace(/\[\[([^\]|]+\|)?([^\]]+)\]\]/g, "$2")),
+        stripNestedTemplates(
+          (firstPara || "").replace(/'''/g, "").replace(/\[\[([^\]|]+\|)?([^\]]+)\]\]/g, "$2"),
+        ),
       ),
       320,
     ),
@@ -165,7 +183,7 @@ export function wikiToHtml(wikitext: string): string {
       closeList();
       const level = heading[1].length;
       const text = heading[2].replace(/'''/g, "");
-      html.push(`<h${level}>${inlineFormat(escapeHtml(text))}</h${level}>`);
+      html.push(`<h${level}>${inlineFormat(text)}</h${level}>`);
       continue;
     }
 
@@ -182,7 +200,7 @@ export function wikiToHtml(wikitext: string): string {
         html.push("<ul>");
         listType = "ul";
       }
-      html.push(`<li>${inlineFormat(escapeHtml(ul[1]))}</li>`);
+      html.push(`<li>${inlineFormat(ul[1])}</li>`);
       continue;
     }
 
@@ -193,12 +211,12 @@ export function wikiToHtml(wikitext: string): string {
         html.push("<ol>");
         listType = "ol";
       }
-      html.push(`<li>${inlineFormat(escapeHtml(ol[1]))}</li>`);
+      html.push(`<li>${inlineFormat(ol[1])}</li>`);
       continue;
     }
 
     closeList();
-    html.push(`<p>${inlineFormat(escapeHtml(line))}</p>`);
+    html.push(`<p>${inlineFormat(line)}</p>`);
   }
   closeList();
 
@@ -213,11 +231,33 @@ export function plainToHtml(text: string): string {
     .map((block) => {
       const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
       if (lines.length === 0) return "";
-      if (lines.length === 1 && lines[0].length < 80 && /[A-Z]/.test(lines[0]) && lines[0] === lines[0].toUpperCase()) {
+      if (
+        lines.length === 1 &&
+        lines[0].length < 80 &&
+        /[A-Z]/.test(lines[0]) &&
+        lines[0] === lines[0].toUpperCase()
+      ) {
         return `<h3>${escapeHtml(lines[0])}</h3>`;
       }
-      const withBreaks = lines.map((l) => inlineFormat(escapeHtml(l))).join("<br />");
+      const withBreaks = lines.map((l) => inlineFormat(l)).join("<br />");
       return `<p>${withBreaks}</p>`;
     })
     .join("\n");
+}
+
+export function htmlLooksBroken(html: string): string[] {
+  const issues: string[] = [];
+  const text = html.replace(/<script[\s\S]*?<\/script>/gi, " ").replace(/<[^>]+>/g, " ");
+  if (/target="_blank"/.test(text) || /rel="noreferrer"/.test(text)) {
+    issues.push("raw target=_blank leaked into visible text");
+  }
+  if (/\[\[.+\]\]/.test(html)) {
+    issues.push("unparsed wiki link brackets remain");
+  }
+  const opens = (html.match(/<a\b/gi) || []).length;
+  const closes = (html.match(/<\/a>/gi) || []).length;
+  if (opens !== closes) {
+    issues.push(`unbalanced anchors (${opens} open, ${closes} close)`);
+  }
+  return issues;
 }

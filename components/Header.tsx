@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useFeed, useSyncedLabel } from "./FeedProvider";
+import { SearchControl } from "./Search";
+import { ThemeToggle } from "./Theme";
 import { statusLabel, statusTone } from "@/lib/format";
 
 const LINKS = [
@@ -64,14 +66,18 @@ export function Header() {
               </Link>
             ))}
           </nav>
-          <button
-            className="menu-btn"
-            aria-label="Menu"
-            aria-expanded={open}
-            onClick={() => setOpen((v) => !v)}
-          >
-            {open ? "Close" : "Menu"}
-          </button>
+          <div className="tools">
+            <SearchControl />
+            <ThemeToggle />
+            <button
+              className="menu-btn"
+              aria-label="Menu"
+              aria-expanded={open}
+              onClick={() => setOpen((v) => !v)}
+            >
+              {open ? "Close" : "Menu"}
+            </button>
+          </div>
         </div>
         {open ? (
           <div className="drawer">

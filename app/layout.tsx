@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Bricolage_Grotesque, Fraunces, IBM_Plex_Mono } from "next/font/google";
 import { FeedProvider } from "@/components/FeedProvider";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { ThemeProvider } from "@/components/Theme";
 import { emptyFeed, getFeed } from "@/lib/feed";
 import "./globals.css";
+
+const themeBoot = `(function(){try{var t=localStorage.getItem('cb-theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',t)}catch(e){}})();`;
 
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -54,13 +58,18 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${bricolage.variable} ${fraunces.variable} ${ibm.variable}`}>
-        <FeedProvider initial={feed}>
-          <Header />
-          {children}
-          <Footer />
-        </FeedProvider>
+        <Script id="theme-boot" strategy="beforeInteractive">
+          {themeBoot}
+        </Script>
+        <ThemeProvider>
+          <FeedProvider initial={feed}>
+            <Header />
+            {children}
+            <Footer />
+          </FeedProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

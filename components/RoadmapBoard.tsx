@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { RoadmapCard, RoadmapRelease } from "@/lib/types";
 import { useFeed } from "./FeedProvider";
+import { FeatureEntry } from "./FeatureEntry";
 import { formatDateTime } from "@/lib/format";
 
 export function CardDrawer({
@@ -59,15 +60,7 @@ function Chapter({
         {cards.length} {cards.length === 1 ? "item" : "items"}
       </p>
       {cards.map((card, i) => (
-        <button key={card.id} className="cat-row" type="button" onClick={() => onOpen(card)}>
-          <span className="num">{String(i + 1).padStart(2, "0")}</span>
-          <span className="name">
-            {card.name}
-            <small>
-              {card.category} · {card.status}
-            </small>
-          </span>
-        </button>
+        <FeatureEntry key={card.id} card={card} index={i} compact onOpen={onOpen} />
       ))}
       {cards.length === 0 ? <p style={{ color: "var(--faint)" }}>Nothing in this category.</p> : null}
     </section>

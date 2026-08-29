@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import type { PatchArticle } from "@/lib/types";
 import { formatDate, relativeTime } from "@/lib/format";
+import { FeatureEntry } from "./FeatureEntry";
 import { useFeed } from "./FeedProvider";
 
 export function PatchList() {
@@ -92,14 +93,11 @@ export function PatchArticleView({ article }: { article: PatchArticle }) {
                 <h2>In this release</h2>
               </div>
             </div>
-            {article.cards.map((card, i) => (
-              <div key={card.id} className="cat-row" style={{ cursor: "default" }}>
-                <span className="num">{String(i + 1).padStart(2, "0")}</span>
-                <span className="name">{card.name}</span>
-                <span className="meta">{card.category}</span>
-                <span className="status">{card.status}</span>
-              </div>
-            ))}
+            <div className="feature-stack">
+              {article.cards.map((card, i) => (
+                <FeatureEntry key={card.id} card={card} index={i} />
+              ))}
+            </div>
           </div>
         </section>
       ) : null}
