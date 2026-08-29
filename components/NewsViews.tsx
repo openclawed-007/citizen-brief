@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { NewsArticle, NewsKind } from "@/lib/types";
-import { formatDateTime, kindLabel, relativeTime } from "@/lib/format";
+import { formatDate, formatDateTime, kindLabel } from "@/lib/format";
 import { useFeed } from "./FeedProvider";
 
 const FILTERS: { id: "all" | NewsKind; label: string }[] = [
@@ -18,26 +18,39 @@ const FILTERS: { id: "all" | NewsKind; label: string }[] = [
 export function NewsList() {
   const { feed } = useFeed();
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["id"]>("all");
-  const items = useMemo(
-    () => feed.news.filter((n) => filter === "all" || n.kind === filter),
-    [feed.news, filter],
-  );
+  const [q, setQ] = useState("");
+  const items = useMemo(() => {
+    const query = q.trim().toLowerCase();
+    return feed.news.filter((n) => {
+      if (filter !== "all" && n.kind !== filter) return false;
+      if (query && !`${n.title} ${n.excerpt}`.toLowerCase().includes(query)) return false;
+      return true;
+    });
+  }, [feed.news, filter, q]);
+  const lead = items[0];
 
   return (
     <main id="content">
       <section className="page-hero">
         <div className="shell">
-          <div className="kicker">Comm-links</div>
-          <h1>Official information</h1>
+          <p className="eyebrow">RSI comm-links</p>
+          <h1>Transmissions</h1>
           <p className="lede">
-            Transmissions, patch announcements, roadmap roundups, and letters from the
-            chairman — ingested as RSI publishes them.
+            Patch announcements, roadmap roundups, weekly notes, and letters from the
+            chairman — listed as they are published.
           </p>
         </div>
       </section>
       <section className="section">
         <div className="shell">
           <div className="filters">
+            <input
+              className="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search titles"
+              aria-label="Search transmissions"
+            />
             {FILTERS.map((f) => (
               <button
                 key={f.id}
@@ -49,18 +62,24 @@ export function NewsList() {
               </button>
             ))}
           </div>
-          <div className="cards">
-            {items.map((item) => (
-              <Link key={item.id} href={`/news/${item.id}`} className="card">
-                <div className="card-media">
-                  {item.image ? <img src={item.image} alt="" /> : <div className="ph" style={{ width: "100%", height: "100%" }} />}
-                </div>
-                <div className="card-body">
-                  <span className="tag">{kindLabel(item.kind)}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.excerpt}</p>
-                  <div className="card-foot">{item.publishedAt ? relativeTime(item.publishedAt) : ""}</div>
-                </div>
+          {lead ? (
+            <Link href={`/news/${lead.id}`} className="lead-story">
+              {lead.image ? <img src={lead.image} alt="" /> : <div className="ph" />}
+              <div>
+                <span className="kind">{kindLabel(lead.kind)}</span>
+                <h3>{lead.title}</h3>
+                <p>{lead.excerpt}</p>
+              </div>
+            </Link>
+          ) : (
+            <p style={{ color: "var(--mute)" }}>No matching transmissions.</p>
+          )}
+          <div className="index">
+            {items.slice(1).map((item) => (
+              <Link key={item.id} href={`/news/${item.id}`}>
+                <time>{item.publishedAt ? formatDate(item.publishedAt) : ""}</time>
+                <span className="kind">{kindLabel(item.kind)}</span>
+                <span className="name">{item.title}</span>
               </Link>
             ))}
           </div>
@@ -77,7 +96,7 @@ export function NewsArticleView({ article }: { article: NewsArticle }) {
 
   return (
     <main id="content" className="article">
-      <div className="kicker">{kindLabel(article.kind)}</div>
+      <p className="eyebrow">{kindLabel(article.kind)}</p>
       <h1>{article.title}</h1>
       <div className="meta-row">
         {article.publishedAt ? <span>{formatDateTime(article.publishedAt)}</span> : null}
@@ -88,7 +107,7 @@ export function NewsArticleView({ article }: { article: NewsArticle }) {
         <img
           src={cover.url}
           alt={cover.alt}
-          style={{ width: "100%", borderRadius: 18, margin: "8px 0 24px", border: "1px solid var(--line)" }}
+          style={{ width: "100%", margin: "8px 0 24px", border: "1px solid var(--ink)" }}
         />
       ) : null}
       <div className="prose" dangerouslySetInnerHTML={{ __html: article.html }} />
@@ -103,7 +122,7 @@ export function NewsArticleView({ article }: { article: NewsArticle }) {
         <a className="btn primary" href={article.url} target="_blank" rel="noreferrer">
           Read on RSI
         </a>
-        <Link className="btn ghost" href="/news">
+        <Link className="btn" href="/news">
           All transmissions
         </Link>
       </div>

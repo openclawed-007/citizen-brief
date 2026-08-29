@@ -3,50 +3,74 @@
 import { useMemo, useState } from "react";
 import type { RoadmapCard, RoadmapRelease } from "@/lib/types";
 import { useFeed } from "./FeedProvider";
-import { formatDateTime, statusTone } from "@/lib/format";
+import { formatDateTime } from "@/lib/format";
 
-export function RoadmapColumn({
+export function CardDrawer({
+  card,
+  onClose,
+}: {
+  card: RoadmapCard | null;
+  onClose: () => void;
+}) {
+  if (!card) return null;
+  return (
+    <div className="modal-back" onClick={onClose} role="presentation">
+      <div className="modal" role="dialog" aria-labelledby="card-title" onClick={(e) => e.stopPropagation()}>
+        <p className="eyebrow">
+          {card.release} · {card.category}
+        </p>
+        <h3 id="card-title">{card.name}</h3>
+        <p className="status" style={{ textAlign: "left" }}>
+          {card.status}
+        </p>
+        {card.image ? <img src={card.image} alt="" /> : null}
+        <p style={{ color: "var(--ink-soft)", lineHeight: 1.65 }}>{card.description}</p>
+        <div className="actions">
+          <a className="btn" href={card.url} target="_blank" rel="noreferrer">
+            View on RSI
+          </a>
+          <button className="btn primary" type="button" onClick={onClose}>
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Chapter({
   release,
-  limit,
   category,
   onOpen,
 }: {
   release: RoadmapRelease;
-  limit?: number;
-  category?: string;
-  onOpen?: (card: RoadmapCard) => void;
+  category: string;
+  onOpen: (card: RoadmapCard) => void;
 }) {
-  const cards = release.cards.filter((c) => !category || category === "All" || c.category === category);
-  const shown = typeof limit === "number" ? cards.slice(0, limit) : cards;
-
+  const cards = release.cards.filter((c) => category === "All" || c.category === category);
+  const label = release.name === "Star Citizen 1.0" ? "Star Citizen 1.0" : `Alpha ${release.name}`;
   return (
-    <div className="column">
-      <div className="column-head">
-        <div>
-          <div className="kicker" style={{ letterSpacing: "0.18em" }}>
-            {release.name === "Star Citizen 1.0" ? "Horizon" : "Release"}
-          </div>
-          <h3>{release.name === "Star Citizen 1.0" ? "Star Citizen 1.0" : `Alpha ${release.name}`}</h3>
-        </div>
-        <span className={`tag ${statusTone(release.status) === "ok" ? "ok" : "warn"}`}>
-          {release.status}
-        </span>
-      </div>
-      <div className="column-stack">
-        {shown.map((card) => (
-          <button key={card.id} className="mini" type="button" onClick={() => onOpen?.(card)}>
-            {card.image ? <img src={card.image} alt="" /> : <div className="ph" />}
-            <span>
-              <strong>{card.name}</strong>
-              <small>
-                {card.category} · {card.status}
-              </small>
-            </span>
-          </button>
-        ))}
-        {shown.length === 0 ? <p style={{ color: "var(--faint)" }}>No cards in this filter.</p> : null}
-      </div>
-    </div>
+    <section className="chapter">
+      <p className="chapter-kicker">
+        {release.name === "Star Citizen 1.0" ? "Horizon" : "Release"} · {release.status}
+      </p>
+      <h3>{label}</h3>
+      <p style={{ color: "var(--mute)", margin: "0 0 12px", fontSize: 14 }}>
+        {cards.length} {cards.length === 1 ? "item" : "items"}
+      </p>
+      {cards.map((card, i) => (
+        <button key={card.id} className="cat-row" type="button" onClick={() => onOpen(card)}>
+          <span className="num">{String(i + 1).padStart(2, "0")}</span>
+          <span className="name">
+            {card.name}
+            <small>
+              {card.category} · {card.status}
+            </small>
+          </span>
+        </button>
+      ))}
+      {cards.length === 0 ? <p style={{ color: "var(--faint)" }}>Nothing in this category.</p> : null}
+    </section>
   );
 }
 
@@ -70,15 +94,14 @@ export function RoadmapView() {
     <main id="content">
       <section className="page-hero">
         <div className="shell">
-          <div className="kicker">Public roadmap</div>
-          <h1>Release view</h1>
-          <p className="lede" style={{ maxWidth: 640 }}>
-            Direct from the official RSI Release View. Cards move when Cloud Imperium publishes a
-            roadmap roundup — this board refreshes itself.
+          <p className="eyebrow">Public board</p>
+          <h1>Roadmap</h1>
+          <p className="lede">
+            Current live column, the next patch, and Star Citizen 1.0 — copied from RSI Release
+            View whenever Cloud Imperium publishes a roundup.
           </p>
           <div className="meta-row">
-            <span>{roadmap.liveVersionLabel.replace(/\[.*?\]\(.*?\)/g, "").slice(0, 80)}</span>
-            {roadmap.lastUpdatedIso ? <span>Updated {formatDateTime(roadmap.lastUpdatedIso)}</span> : null}
+            {roadmap.lastUpdatedIso ? <span>Board updated {formatDateTime(roadmap.lastUpdatedIso)}</span> : null}
             {roadmap.notificationTitle ? <span>{roadmap.notificationTitle}</span> : null}
           </div>
           <div className="actions">
@@ -86,7 +109,7 @@ export function RoadmapView() {
               Open RSI roadmap
             </a>
             {roadmap.notificationUrl ? (
-              <a className="btn ghost" href={roadmap.notificationUrl} target="_blank" rel="noreferrer">
+              <a className="btn" href={roadmap.notificationUrl} target="_blank" rel="noreferrer">
                 Latest roundup
               </a>
             ) : null}
@@ -95,7 +118,7 @@ export function RoadmapView() {
       </section>
       <section className="section">
         <div className="shell">
-          <div className="filters">
+          <div className="filters" aria-label="Filter by category">
             {cats.map((c) => (
               <button
                 key={c}
@@ -109,34 +132,12 @@ export function RoadmapView() {
           </div>
           <div className="board">
             {columns.map((rel) => (
-              <RoadmapColumn
-                key={rel.id}
-                release={rel}
-                category={category}
-                onOpen={setOpen}
-              />
+              <Chapter key={rel.id} release={rel} category={category} onOpen={setOpen} />
             ))}
           </div>
         </div>
       </section>
-      {open ? (
-        <div className="modal-back" onClick={() => setOpen(null)} role="presentation">
-          <div className="modal" role="dialog" onClick={(e) => e.stopPropagation()}>
-            <span className="tag">{open.category} · {open.status}</span>
-            <h3>{open.name}</h3>
-            {open.image ? <img src={open.image} alt="" /> : null}
-            <p style={{ color: "var(--muted)", lineHeight: 1.6 }}>{open.description}</p>
-            <div className="actions" style={{ marginTop: 16 }}>
-              <a className="btn ghost" href={open.url} target="_blank" rel="noreferrer">
-                View on RSI
-              </a>
-              <button className="btn primary" type="button" onClick={() => setOpen(null)}>
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <CardDrawer card={open} onClose={() => setOpen(null)} />
     </main>
   );
 }

@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Manrope, Syne } from "next/font/google";
+import { Bricolage_Grotesque, Fraunces, IBM_Plex_Mono } from "next/font/google";
 import { FeedProvider } from "@/components/FeedProvider";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { emptyFeed, getFeed } from "@/lib/feed";
 import "./globals.css";
 
-const manrope = Manrope({
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  variable: "--font-manrope",
+  variable: "--font-bricolage",
   display: "swap",
 });
 
-const syne = Syne({
+const fraunces = Fraunces({
   subsets: ["latin"],
-  variable: "--font-syne",
+  variable: "--font-fraunces",
   display: "swap",
 });
 
@@ -55,7 +55,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${manrope.variable} ${syne.variable} ${ibm.variable}`}>
+      <body className={`${bricolage.variable} ${fraunces.variable} ${ibm.variable}`}>
         <FeedProvider initial={feed}>
           <Header />
           {children}

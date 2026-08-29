@@ -1,9 +1,9 @@
 export default function Loading() {
   return (
-    <main className="shell" style={{ padding: "80px 0" }}>
-      <div className="kicker">Syncing official sources</div>
-      <h1 style={{ fontSize: 42 }}>Updating briefing…</h1>
-      <p className="lede">Harvesting patches, roadmap, and transmissions.</p>
+    <main className="shell" style={{ padding: "64px 0" }}>
+      <p className="eyebrow">Syncing</p>
+      <h1>Updating the issue…</h1>
+      <p className="lede">Pulling the live patch, roadmap, and latest transmissions.</p>
     </main>
   );
 }

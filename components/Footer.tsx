@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { formatDateTime } from "@/lib/format";
 import { useFeed, useSyncedLabel } from "./FeedProvider";
 
@@ -11,19 +12,16 @@ export function Footer() {
     <footer className="footer">
       <div className="shell footer-grid">
         <div>
-          <strong style={{ color: "var(--ivory)", letterSpacing: "0.14em", fontSize: 12 }}>
-            CITIZEN BRIEF
-          </strong>
+          <p className="brand-name" style={{ fontSize: 28, margin: "0 0 8px" }}>
+            Citizen<em> Brief</em>
+          </p>
           <p>
-            An unofficial live briefing for Star Citizen. Patches, the public
-            roadmap, and RSI transmissions are pulled automatically from official
-            Cloud Imperium sources and the Star Citizen Wiki.
+            Unofficial live briefing for Star Citizen. Patches, the public roadmap, and
+            RSI transmissions are harvested automatically. Not affiliated with Cloud
+            Imperium Games.
           </p>
           <p className="sync">
-            {label}
-            {" · "}
-            Last harvest {formatDateTime(feed.fetchedAt)}
-            {" · "}
+            {label} · Last harvest {formatDateTime(feed.fetchedAt)} ·{" "}
             <button
               type="button"
               onClick={() => refresh()}
@@ -31,8 +29,10 @@ export function Footer() {
               style={{
                 background: "none",
                 border: 0,
-                color: "var(--gold)",
+                color: "var(--oxide)",
                 padding: 0,
+                cursor: "pointer",
+                font: "inherit",
               }}
             >
               Refresh now
@@ -40,7 +40,17 @@ export function Footer() {
           </p>
         </div>
         <div>
-          <strong style={{ color: "var(--muted)" }}>Official sources</strong>
+          <strong style={{ color: "var(--ink)" }}>Find</strong>
+          <p>
+            <Link href="/patches">Patch notes</Link>
+            <br />
+            <Link href="/roadmap">Roadmap</Link>
+            <br />
+            <Link href="/news">Transmissions</Link>
+          </p>
+        </div>
+        <div>
+          <strong style={{ color: "var(--ink)" }}>Sources</strong>
           <p>
             <a href="https://robertsspaceindustries.com" target="_blank" rel="noreferrer">
               Roberts Space Industries
@@ -50,20 +60,9 @@ export function Footer() {
               Public roadmap
             </a>
             <br />
-            <a href="https://status.robertsspaceindustries.com" target="_blank" rel="noreferrer">
-              RSI status
-            </a>
-          </p>
-        </div>
-        <div>
-          <strong style={{ color: "var(--muted)" }}>Attribution</strong>
-          <p>
-            Game data and comm-links via{" "}
             <a href="https://starcitizen.tools" target="_blank" rel="noreferrer">
               Star Citizen Wiki
             </a>
-            . Star Citizen® is a trademark of Cloud Imperium Games. This site is
-            not affiliated with CIG or RSI.
           </p>
         </div>
       </div>

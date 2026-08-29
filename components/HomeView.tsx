@@ -1,158 +1,186 @@
 "use client";
 
 import Link from "next/link";
-import { formatDate, formatMoney, formatNumber, kindLabel, relativeTime, statusLabel, statusTone } from "@/lib/format";
+import { useState } from "react";
+import type { RoadmapCard } from "@/lib/types";
+import {
+  formatDate,
+  formatMoney,
+  formatNumber,
+  kindLabel,
+  relativeTime,
+  statusLabel,
+  statusTone,
+} from "@/lib/format";
 import { useFeed } from "./FeedProvider";
-import { RoadmapColumn } from "./RoadmapBoard";
+import { CardDrawer } from "./RoadmapBoard";
 
 export function HomeView() {
   const { feed } = useFeed();
   const { live, status, stats, news, roadmap } = feed;
-  const features = (roadmap.current?.cards || []).slice(0, 6);
+  const features = roadmap.current?.cards || [];
   const nextRel = roadmap.upcoming[0];
+  const lead = news[0];
+  const [open, setOpen] = useState<RoadmapCard | null>(null);
 
   return (
     <main id="content">
-      <section className="hero">
-        <div className="shell hero-grid">
-          <div>
-            <div className="kicker">Live environment</div>
-            <h1>Alpha {live.version}</h1>
-            <p className="codename">{live.title}</p>
-            <p className="lede">{live.summary}</p>
-            <div className="meta-row">
-              <span>{live.build || "Build pending"}</span>
-              {live.releasedAt ? <span>Published {formatDate(live.releasedAt)}</span> : null}
-              <span>Channel {live.channel.toUpperCase()}</span>
-            </div>
-            <div className="actions">
-              <Link className="btn primary" href={`/patches/${live.version}`}>
-                Read patch notes
-              </Link>
-              {live.rsiPatchUrl ? (
-                <a className="btn ghost" href={live.rsiPatchUrl} target="_blank" rel="noreferrer">
-                  Official RSI
-                </a>
-              ) : (
-                <Link className="btn ghost" href="/roadmap">
-                  View roadmap
+      <section className="folio">
+        <div className="shell">
+          <nav className="jump" aria-label="On this page">
+            <a href="#patch">Patch notes</a>
+            <a href="#in-patch">In this patch</a>
+            {nextRel ? <a href="#next">Coming next</a> : null}
+            <a href="#posts">Transmissions</a>
+          </nav>
+
+          <div className="spread">
+            <div>
+              <p className="eyebrow">Live environment</p>
+              <h1>Alpha {live.version}</h1>
+              <p className="title">{live.title}</p>
+              <p className="lede">{live.summary}</p>
+              <dl className="facts">
+                <div>
+                  <dt>Build</dt>
+                  <dd>{live.build || "Pending"}</dd>
+                </div>
+                <div>
+                  <dt>Published</dt>
+                  <dd>{live.releasedAt ? formatDate(live.releasedAt) : "—"}</dd>
+                </div>
+                <div>
+                  <dt>Universe</dt>
+                  <dd className={`tone-${statusTone(status.summary)}`}>
+                    {statusLabel(status.summary)}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Next release</dt>
+                  <dd>{nextRel ? `Alpha ${nextRel.name}` : "—"}</dd>
+                </div>
+                <div>
+                  <dt>Citizens</dt>
+                  <dd>{formatNumber(stats.citizens)}</dd>
+                </div>
+                <div>
+                  <dt>Funding</dt>
+                  <dd>{formatMoney(stats.fundsUsd)}</dd>
+                </div>
+              </dl>
+              <div className="actions" id="patch">
+                <Link className="btn primary" href={`/patches/${live.version}`}>
+                  Read the patch notes
                 </Link>
-              )}
+                <Link className="btn" href="/roadmap">
+                  Open the roadmap
+                </Link>
+                {live.rsiPatchUrl ? (
+                  <a className="btn" href={live.rsiPatchUrl} target="_blank" rel="noreferrer">
+                    RSI original
+                  </a>
+                ) : null}
+              </div>
             </div>
-          </div>
-          <div className="hero-panel">
-            {live.image ? (
-              <img src={live.image} alt={live.title} />
-            ) : (
-              <div style={{ minHeight: 340, background: "linear-gradient(135deg,#1a2433,#0c1018)" }} />
-            )}
-            <div className="hero-caption">Artwork from the official public roadmap · RSI</div>
+            <figure className="portrait">
+              {live.image ? <img src={live.image} alt={live.title} /> : <div className="ph" />}
+              <figcaption>Official roadmap still · Roberts Space Industries</figcaption>
+            </figure>
           </div>
         </div>
       </section>
 
-      <div className="shell strip">
-        <div className="stat">
-          <span>Universe</span>
-          <b className={`tone-${statusTone(status.summary)}`}>{statusLabel(status.summary)}</b>
-        </div>
-        <div className="stat">
-          <span>Citizens</span>
-          <b>{formatNumber(stats.citizens)}</b>
-        </div>
-        <div className="stat">
-          <span>Funding</span>
-          <b>{formatMoney(stats.fundsUsd)}</b>
-        </div>
-        <div className="stat">
-          <span>Next on the board</span>
-          <b>{nextRel ? `Alpha ${nextRel.name}` : "—"}</b>
-        </div>
-      </div>
-
-      {status.systems.length > 0 ? (
-        <div className="shell" style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: -28, marginBottom: 36 }}>
-          {status.systems.map((s) => (
-            <span key={s.name} className="tag" style={{ color: "inherit" }}>
-              <span className={`tone-${statusTone(s.status)}`}>●</span>&nbsp;{s.name}
-            </span>
-          ))}
-        </div>
-      ) : null}
-
-      <section className="section">
+      <section className="section" id="in-patch">
         <div className="shell">
           <div className="section-head">
             <div>
-              <div className="kicker">In this release</div>
-              <h2>What landed in {live.version}</h2>
+              <p className="eyebrow">Catalog</p>
+              <h2>What shipped in {live.version}</h2>
+              <p>Every public roadmap card for the live build. Select a row for the full brief.</p>
             </div>
-            <Link href="/roadmap" className="btn ghost">
+            <Link className="more" href="/roadmap">
               Full roadmap
             </Link>
           </div>
-          <div className="cards">
-            {features.map((card) => (
-              <article key={card.id} className="feature">
-                <div className="feature-media">
-                  {card.image ? <img src={card.image} alt={card.name} /> : <div className="ph" />}
-                </div>
-                <div className="feature-body">
-                  <span className={`tag ${card.status === "Released" ? "ok" : "warn"}`}>
-                    {card.category} · {card.status}
-                  </span>
-                  <h3>{card.name}</h3>
-                  <p>{card.description}</p>
-                </div>
-              </article>
-            ))}
+          {features.map((card, i) => (
+            <button key={card.id} className="cat-row" type="button" onClick={() => setOpen(card)}>
+              <span className="num">{String(i + 1).padStart(2, "0")}</span>
+              <span className="name">{card.name}</span>
+              <span className="meta">{card.category}</span>
+              <span className="status">{card.status}</span>
+            </button>
+          ))}
+          <div className="film">
+            {features
+              .filter((c) => c.image)
+              .slice(0, 3)
+              .map((c) => (
+                <img key={c.id} src={c.image || ""} alt={c.name} />
+              ))}
           </div>
         </div>
       </section>
 
       {nextRel ? (
-        <section className="section">
+        <section className="section" id="next">
           <div className="shell">
             <div className="section-head">
               <div>
-                <div className="kicker">On the horizon</div>
-                <h2>Alpha {nextRel.name}</h2>
-                <p>{nextRel.cards.length} deliverables currently scheduled · {nextRel.status}</p>
+                <p className="eyebrow">Scheduled</p>
+                <h2>Coming in Alpha {nextRel.name}</h2>
+                <p>
+                  {nextRel.cards.length} items on the public board · {nextRel.status}
+                </p>
               </div>
+              <Link className="more" href="/roadmap">
+                See all columns
+              </Link>
             </div>
-            <RoadmapColumn release={nextRel} limit={8} />
+            {nextRel.cards.slice(0, 10).map((card, i) => (
+              <button key={card.id} className="cat-row" type="button" onClick={() => setOpen(card)}>
+                <span className="num">{String(i + 1).padStart(2, "0")}</span>
+                <span className="name">{card.name}</span>
+                <span className="meta">{card.category}</span>
+                <span className="status">{card.status}</span>
+              </button>
+            ))}
           </div>
         </section>
       ) : null}
 
-      <section className="section">
+      <section className="section" id="posts">
         <div className="shell">
           <div className="section-head">
             <div>
-              <div className="kicker">Transmissions</div>
-              <h2>Latest official posts</h2>
+              <p className="eyebrow">From RSI</p>
+              <h2>Latest transmissions</h2>
             </div>
-            <Link href="/news" className="btn ghost">
-              All comm-links
+            <Link className="more" href="/news">
+              All posts
             </Link>
           </div>
-          <div className="cards">
-            {news.slice(0, 6).map((item) => (
-              <Link key={item.id} href={`/news/${item.id}`} className="card">
-                <div className="card-media">
-                  {item.image ? <img src={item.image} alt="" /> : <div className="ph" style={{ width: "100%", height: "100%" }} />}
-                </div>
-                <div className="card-body">
-                  <span className="tag">{kindLabel(item.kind)}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.excerpt}</p>
-                  <div className="card-foot">{item.publishedAt ? relativeTime(item.publishedAt) : ""}</div>
-                </div>
+          {lead ? (
+            <Link href={`/news/${lead.id}`} className="lead-story">
+              {lead.image ? <img src={lead.image} alt="" /> : <div className="ph" />}
+              <div>
+                <span className="kind">{kindLabel(lead.kind)}</span>
+                <h3>{lead.title}</h3>
+                <p>{lead.excerpt}</p>
+              </div>
+            </Link>
+          ) : null}
+          <div className="index">
+            {news.slice(1, 8).map((item) => (
+              <Link key={item.id} href={`/news/${item.id}`}>
+                <time>{item.publishedAt ? relativeTime(item.publishedAt) : ""}</time>
+                <span className="kind">{kindLabel(item.kind)}</span>
+                <span className="name">{item.title}</span>
               </Link>
             ))}
           </div>
         </div>
       </section>
+      <CardDrawer card={open} onClose={() => setOpen(null)} />
     </main>
   );
 }

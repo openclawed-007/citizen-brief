@@ -3,62 +3,74 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { useFeed } from "./FeedProvider";
-import { statusTone } from "@/lib/format";
+import { useFeed, useSyncedLabel } from "./FeedProvider";
+import { statusLabel, statusTone } from "@/lib/format";
 
 const LINKS = [
-  { href: "/", label: "Briefing" },
+  { href: "/", label: "Now" },
   { href: "/patches", label: "Patches" },
   { href: "/roadmap", label: "Roadmap" },
-  { href: "/news", label: "Official" },
+  { href: "/news", label: "Transmissions" },
 ];
 
 export function Header() {
   const pathname = usePathname();
-  const { feed, notice, dismiss } = useFeed();
+  const { feed, notice, dismiss, refresh, refreshing } = useFeed();
   const [open, setOpen] = useState(false);
   const tone = statusTone(feed.status.summary);
+  const synced = useSyncedLabel();
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
     <>
       <a className="skip" href="#content">
         Skip to content
       </a>
+      <div className="ticker">
+        <div className="ticker-inner">
+          <span>
+            <span className={`dot ${tone === "ok" ? "" : tone}`} />
+            LIVE {feed.live.version}
+          </span>
+          <span>
+            Universe <b>{statusLabel(feed.status.summary)}</b>
+          </span>
+          {feed.status.systems.map((s) => (
+            <span key={s.name}>
+              {s.name} {s.status === "operational" ? "ok" : s.status}
+            </span>
+          ))}
+          <button type="button" onClick={() => refresh()} disabled={refreshing}>
+            {refreshing ? "Checking…" : synced}
+          </button>
+        </div>
+      </div>
       <header className="header">
-        <div className="header-inner">
+        <div className="mast">
           <Link href="/" className="brand" onClick={() => setOpen(false)}>
-            <svg className="mark" viewBox="0 0 36 36" aria-hidden>
-              <circle cx="18" cy="18" r="15.5" fill="none" stroke="currentColor" strokeWidth="1.2" />
-              <ellipse cx="18" cy="18" rx="15.5" ry="6" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.7" />
-              <circle cx="18" cy="18" r="2.4" fill="currentColor" />
-            </svg>
-            <span>
-              <span className="brand-name">Citizen Brief</span>
-              <span className="brand-sub">Live official desk</span>
+            <span className="brand-name">
+              Citizen<em> Brief</em>
+            </span>
+            <span className="brand-issue">
+              Issue {feed.live.version}
+              {feed.live.title ? ` · ${feed.live.title.replace(/"/g, "")}` : ""}
             </span>
           </Link>
           <nav className="nav" aria-label="Primary">
             {LINKS.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className={pathname === l.href ? "active" : ""}
-              >
+              <Link key={l.href} href={l.href} className={isActive(l.href) ? "active" : ""}>
                 {l.label}
               </Link>
             ))}
           </nav>
-          <div className="live-chip" title={feed.status.summary}>
-            <span className={`pulse ${tone === "ok" ? "" : tone}`} />
-            LIVE {feed.live.version}
-          </div>
           <button
             className="menu-btn"
             aria-label="Menu"
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
           >
-            ☰
+            {open ? "Close" : "Menu"}
           </button>
         </div>
         {open ? (
@@ -67,7 +79,7 @@ export function Header() {
               <Link
                 key={l.href}
                 href={l.href}
-                className={pathname === l.href ? "nav-link active" : "nav-link"}
+                className={isActive(l.href) ? "active" : ""}
                 onClick={() => setOpen(false)}
               >
                 {l.label}
@@ -79,7 +91,6 @@ export function Header() {
       {notice ? (
         <div className="notice" role="status">
           <div className="notice-inner">
-            <span className="pulse" />
             <span>{notice}</span>
             <button type="button" onClick={dismiss} aria-label="Dismiss">
               ×
@@ -87,13 +98,6 @@ export function Header() {
           </div>
         </div>
       ) : null}
-      <nav className="bottom-nav" aria-label="Mobile">
-        {LINKS.map((l) => (
-          <Link key={l.href} href={l.href} className={pathname === l.href ? "active" : ""}>
-            {l.label}
-          </Link>
-        ))}
-      </nav>
     </>
   );
 }

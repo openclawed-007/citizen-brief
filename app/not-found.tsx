@@ -3,18 +3,20 @@ import Link from "next/link";
 export default function NotFound() {
   return (
     <main className="article">
-      <div className="kicker">Signal lost</div>
-      <h1>This briefing does not exist</h1>
+      <p className="eyebrow">Missing folio</p>
+      <h1>This page is not in the current issue.</h1>
       <p className="lede">
-        The page you requested is not in the live desk. It may have been renamed when
-        a new patch published.
+        It may have moved when a new patch published. Start from the live briefing.
       </p>
       <div className="actions">
         <Link className="btn primary" href="/">
-          Return to briefing
+          Now
         </Link>
-        <Link className="btn ghost" href="/news">
-          Official posts
+        <Link className="btn" href="/patches">
+          Patches
+        </Link>
+        <Link className="btn" href="/news">
+          Transmissions
         </Link>
       </div>
     </main>

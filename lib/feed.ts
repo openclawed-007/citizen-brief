@@ -150,21 +150,27 @@ async function buildFeed(): Promise<Feed> {
     ? (statsRes.value as { data?: { fans?: number; funds?: number } })
     : null;
 
-  const patches: PatchSummary[] = versions.map((v) => {
+  const seenVersions = new Set<string>();
+  const patches: PatchSummary[] = [];
+  for (const v of versions) {
     const version = versionFromCode(v.code);
-    const rel = matchRelease(numbered, version);
-    return {
+    if (seenVersions.has(version)) continue;
+    seenVersions.add(version);
+    patches.push({
       version,
       build: v.code,
       code: v.code,
       channel: v.channel,
       releasedAt: v.released_at,
       isLive: Boolean(v.is_default),
-      title: rel?.cards[0]?.name || `Star Citizen Alpha ${version}`,
+      title:
+        v.is_default && live.title
+          ? `Alpha ${version} — ${live.title.replace(/"/g, "")}`
+          : `Star Citizen Alpha ${version}`,
       wikiUrl: `https://starcitizen.tools/${wikiPatchTitle(version).replace(/ /g, "_")}`,
       rsiUrl: null,
-    };
-  });
+    });
+  }
 
   const feed: Feed = {
     fetchedAt: new Date().toISOString(),
