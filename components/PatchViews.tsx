@@ -103,7 +103,7 @@ export function PatchArticleView({ article }: { article: PatchArticle }) {
         </section>
       ) : null}
 
-      <section className="article" style={{ paddingTop: 24 }}>
+      <section className="article article-body">
         {toc.length > 1 ? (
           <nav className="toc" aria-label="On this page">
             <strong>On this page</strong>
@@ -115,7 +115,7 @@ export function PatchArticleView({ article }: { article: PatchArticle }) {
           </nav>
         ) : null}
         <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />
-        <div className="actions" style={{ marginTop: 28 }}>
+        <div className="actions actions-spaced">
           {article.prev ? (
             <Link className="btn" href={`/patches/${article.prev.replace(/^Star Citizen Alpha\s+/i, "")}`}>
               ← {article.prev}

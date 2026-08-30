@@ -38,11 +38,9 @@ export function CardDrawer({
           {card.release} · {card.category}
         </p>
         <h3 id="card-title">{card.name}</h3>
-        <p className="status" style={{ textAlign: "left" }}>
-          {card.status}
-        </p>
+        <p className="status">{card.status}</p>
         {card.image ? <img src={card.image} alt="" /> : null}
-        <p style={{ color: "var(--ink-soft)", lineHeight: 1.65 }}>{card.description}</p>
+        <p>{card.description}</p>
         <div className="actions">
           <a className="btn" href={card.url} target="_blank" rel="noreferrer">
             View on RSI
@@ -73,13 +71,13 @@ function Chapter({
         {release.name === "Star Citizen 1.0" ? "Horizon" : "Release"} · {release.status}
       </p>
       <h3>{label}</h3>
-      <p style={{ color: "var(--mute)", margin: "0 0 12px", fontSize: 14 }}>
+      <p className="chapter-count">
         {cards.length} {cards.length === 1 ? "item" : "items"}
       </p>
       {cards.map((card, i) => (
         <FeatureEntry key={card.id} card={card} index={i} compact onOpen={onOpen} />
       ))}
-      {cards.length === 0 ? <p style={{ color: "var(--faint)" }}>Nothing in this category.</p> : null}
+      {cards.length === 0 ? <p className="chapter-empty">Nothing in this category.</p> : null}
     </section>
   );
 }

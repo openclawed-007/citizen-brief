@@ -12,7 +12,7 @@ function Copy({ card, index }: { card: RoadmapCard; index: number }) {
         </span>
       </span>
       <strong className="name">{card.name}</strong>
-      {card.description ? <p>{card.description}</p> : null}
+      {card.description ? <span className="desc">{card.description}</span> : null}
     </span>
   );
 }

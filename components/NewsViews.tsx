@@ -72,7 +72,7 @@ export function NewsList() {
               </div>
             </Link>
           ) : (
-            <p style={{ color: "var(--mute)" }}>No matching transmissions.</p>
+            <p className="empty-note">No matching stories. Try a different filter.</p>
           )}
           <div className="index">
             {items.slice(1).map((item) => (
@@ -103,13 +103,7 @@ export function NewsArticleView({ article }: { article: NewsArticle }) {
         <span>{article.channel}</span>
         {article.series && article.series !== "None" ? <span>{article.series}</span> : null}
       </div>
-      {cover ? (
-        <img
-          src={cover.url}
-          alt={cover.alt}
-          style={{ width: "100%", margin: "8px 0 24px", border: "1px solid var(--ink)" }}
-        />
-      ) : null}
+      {cover ? <img className="cover" src={cover.url} alt={cover.alt} /> : null}
       <div className="prose" dangerouslySetInnerHTML={{ __html: article.html }} />
       {article.images.length > 1 ? (
         <div className="gallery">
@@ -118,7 +112,7 @@ export function NewsArticleView({ article }: { article: NewsArticle }) {
           ))}
         </div>
       ) : null}
-      <div className="actions" style={{ marginTop: 28 }}>
+      <div className="actions actions-spaced">
         <a className="btn primary" href={article.url} target="_blank" rel="noreferrer">
           Read on RSI
         </a>

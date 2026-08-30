@@ -206,8 +206,22 @@ export function SearchControl() {
         className="icon-btn search-launch"
         onClick={() => setOpen(true)}
         aria-label="Search"
+        title="Search (press / or Ctrl+K)"
       >
-        Search
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          aria-hidden
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.5-3.5" />
+        </svg>
+        <span>Search</span>
       </button>
       <SearchDialog open={open} onClose={() => setOpen(false)} />
     </>

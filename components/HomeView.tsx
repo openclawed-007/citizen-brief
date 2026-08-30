@@ -33,71 +33,75 @@ export function HomeView() {
 
   return (
     <main id="content">
-      <section className="folio">
+      <section className="home-top" id="patch">
         <div className="shell">
           <nav className="jump" aria-label="On this page">
-            <span>Briefing index</span>
-            <a href="#patch">Live build</a>
+            <span>Jump to</span>
             <a href="#in-patch">What shipped</a>
             {nextRel ? <a href="#next">Coming next</a> : null}
             <a href="#posts">Latest news</a>
           </nav>
 
-          <div className="spread">
-            <div>
-              <p className="eyebrow"><span className="live-pulse" /> Current live build</p>
-              <h1><span>Alpha</span> {live.version}</h1>
-              <p className="title">{live.title}</p>
-              <p className="lede">{live.summary}</p>
-              <dl className="facts">
-                <div>
-                  <dt>Build</dt>
-                  <dd>{live.build || "Pending"}</dd>
+          <div className="hero">
+            <div className="hero-grid">
+              <div className="hero-copy">
+                <p className="eyebrow">
+                  <span className={`dot ${statusTone(status.summary)}`} aria-hidden /> Current
+                  live build
+                </p>
+                <h1>Alpha {live.version}</h1>
+                <p className="title">{live.title}</p>
+                <p className="lede">{live.summary}</p>
+                <div className="actions">
+                  <Link
+                    className="btn primary"
+                    href={patchHref({ version: live.version, wikiUrl: live.wikiUrl || "/patches" })}
+                  >
+                    Read the patch notes
+                  </Link>
+                  <Link className="btn" href="/roadmap">
+                    Open the roadmap
+                  </Link>
+                  {live.rsiPatchUrl ? (
+                    <a className="btn" href={live.rsiPatchUrl} target="_blank" rel="noreferrer">
+                      RSI original
+                    </a>
+                  ) : null}
                 </div>
-                <div>
-                  <dt>Published</dt>
-                  <dd>{live.releasedAt ? formatDate(live.releasedAt) : "—"}</dd>
-                </div>
-                <div>
-                  <dt>Universe</dt>
-                  <dd className={`tone-${statusTone(status.summary)}`}>
-                    {statusLabel(status.summary)}
-                  </dd>
-                </div>
-                <div>
-                  <dt>Next release</dt>
-                  <dd>{nextRel ? `Alpha ${nextRel.name}` : "—"}</dd>
-                </div>
-                <div>
-                  <dt>Citizens</dt>
-                  <dd>{formatNumber(stats.citizens)}</dd>
-                </div>
-                <div>
-                  <dt>Funding</dt>
-                  <dd>{formatMoney(stats.fundsUsd)}</dd>
-                </div>
-              </dl>
-              <div className="actions" id="patch">
-                <Link
-                  className="btn primary"
-                  href={patchHref({ version: live.version, wikiUrl: live.wikiUrl || "/patches" })}
-                >
-                  Read the patch notes
-                </Link>
-                <Link className="btn" href="/roadmap">
-                  Open the roadmap
-                </Link>
-                {live.rsiPatchUrl ? (
-                  <a className="btn" href={live.rsiPatchUrl} target="_blank" rel="noreferrer">
-                    RSI original
-                  </a>
-                ) : null}
               </div>
+              <figure className="hero-media">
+                {live.image ? <img src={live.image} alt={live.title} /> : <div className="ph" />}
+                <figcaption>Official still · Roberts Space Industries</figcaption>
+              </figure>
             </div>
-            <figure className="portrait">
-              {live.image ? <img src={live.image} alt={live.title} /> : <div className="ph" />}
-              <figcaption>Official roadmap still · Roberts Space Industries</figcaption>
-            </figure>
+            <dl className="facts">
+              <div>
+                <dt>Build</dt>
+                <dd>{live.build || "Pending"}</dd>
+              </div>
+              <div>
+                <dt>Published</dt>
+                <dd>{live.releasedAt ? formatDate(live.releasedAt) : "—"}</dd>
+              </div>
+              <div>
+                <dt>Universe</dt>
+                <dd className={`tone-${statusTone(status.summary)}`}>
+                  {statusLabel(status.summary)}
+                </dd>
+              </div>
+              <div>
+                <dt>Next release</dt>
+                <dd>{nextRel ? `Alpha ${nextRel.name}` : "—"}</dd>
+              </div>
+              <div>
+                <dt>Citizens</dt>
+                <dd>{formatNumber(stats.citizens)}</dd>
+              </div>
+              <div>
+                <dt>Funding</dt>
+                <dd>{formatMoney(stats.fundsUsd)}</dd>
+              </div>
+            </dl>
           </div>
         </div>
       </section>
