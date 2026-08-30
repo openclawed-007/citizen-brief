@@ -108,7 +108,7 @@ export function SearchDialog({ open, onClose }: { open: boolean; onClose: () => 
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined" || !document.body) return null;
 
   const go = (href: string) => {
     onClose();
