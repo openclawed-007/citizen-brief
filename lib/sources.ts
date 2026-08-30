@@ -24,6 +24,7 @@ async function pull(
     ...init,
     cache: "no-store",
     headers,
+    signal: init.signal || AbortSignal.timeout(12_000),
   });
   const text = await res.text();
   let json: unknown = null;

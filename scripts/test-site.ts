@@ -2,6 +2,7 @@ import { readFile, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { getPatchArticle } from "../lib/feed";
 import { htmlLooksBroken, inlineFormat, wikiToHtml } from "../lib/wiki";
+import { rankSearch, type SearchCandidate } from "../lib/search";
 
 const issues: string[] = [];
 const ok: string[] = [];
@@ -51,6 +52,44 @@ async function main() {
   );
   assert(!/\[\[[^\]]+\]\]/.test(visibleConverted), "No leftover [[wiki]] brackets", "Leftover wiki brackets in HTML");
 
+  const searchFixtures: (SearchCandidate & { id: string })[] = [
+    { id: "patch", title: "Alpha 4.10 patch notes", searchText: "live build release", keywords: "patch update", priority: 5 },
+    { id: "status", title: "Universe operational", searchText: "platform service", keywords: "server status outage", priority: 4 },
+    { id: "ship", title: "Drake Ironclad", searchText: "cargo spacecraft", keywords: "ship vehicle", priority: 3 },
+  ];
+  assert(
+    rankSearch(searchFixtures, "ptach")[0]?.id === "patch",
+    "Smart search tolerates likely typing mistakes",
+    "Smart search did not relate 'ptach' to patch notes",
+  );
+  assert(
+    rankSearch(searchFixtures, "server")[0]?.id === "status",
+    "Smart search understands status intent",
+    "Smart search did not relate 'server' to universe status",
+  );
+  assert(
+    rankSearch(searchFixtures, "cargo ship")[0]?.id === "ship",
+    "Smart search ranks multi-word intent",
+    "Smart search did not rank the matching ship",
+  );
+  assert(
+    rankSearch(searchFixtures, "zzzzzz").length > 0,
+    "Smart search always offers useful fallbacks",
+    "Smart search rendered an empty suggestion list",
+  );
+
+  const browserProvider = await readFile(
+    join(process.cwd(), "components", "FeedProvider.tsx"),
+    "utf8",
+  );
+  assert(
+    browserProvider.includes("/feed.json") &&
+      !browserProvider.includes("fetchCommLinks") &&
+      !browserProvider.includes("fetchGameVersions"),
+    "Open tabs only revalidate the deployed feed",
+    "Browser refresh code can still contact upstream APIs per visitor",
+  );
+
   process.env.HARVEST = "1";
   const article = await getPatchArticle("4.10.0");
   const liveIssues = htmlLooksBroken(article.html);
@@ -83,6 +122,30 @@ async function main() {
     assert(home.includes("feature-entry") || home.includes("feature-hero"), "Home includes designed feature stills", "Home is missing feature image layout");
     assert(home.includes("search-launch") || home.includes("Search"), "Search control is present", "Search control missing from home");
     assert(home.includes("Switch to dark mode") || home.includes("Dark") || home.includes("theme"), "Dark mode toggle is present", "Dark mode toggle missing");
+
+    const exportedFeed = JSON.parse(await readFile(join(outDir, "feed.json"), "utf8")) as {
+      news: { id: number }[];
+      patches: { version: string }[];
+    };
+    const expectedRoutes = [
+      ...exportedFeed.news.map((item) => `news/${item.id}/index.html`),
+      ...exportedFeed.patches.map((patch) => `patches/${patch.version}/index.html`),
+    ];
+    const missingRoutes: string[] = [];
+    await Promise.all(
+      expectedRoutes.map(async (route) => {
+        try {
+          await stat(join(outDir, route));
+        } catch {
+          missingRoutes.push(route);
+        }
+      }),
+    );
+    assert(
+      missingRoutes.length === 0,
+      `Every feed item has an exported destination (${expectedRoutes.length} routes)`,
+      `Feed contains dead internal routes: ${missingRoutes.join(", ")}`,
+    );
 
     for (const page of pages) {
       const html = await readFile(page, "utf8");

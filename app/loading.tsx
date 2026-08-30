@@ -1,9 +1,12 @@
 export default function Loading() {
   return (
-    <main className="shell" style={{ padding: "64px 0" }}>
-      <p className="eyebrow">Syncing</p>
-      <h1>Updating the issue…</h1>
-      <p className="lede">Pulling the live patch, roadmap, and latest transmissions.</p>
+    <main id="content" className="shell loading-view" aria-busy="true" aria-live="polite">
+      <p className="eyebrow"><span className="live-pulse" /> Syncing official sources</p>
+      <h1>Building your briefing</h1>
+      <p className="lede">Checking the live build, roadmap, and latest news.</p>
+      <div className="loading-grid" aria-hidden="true">
+        <span /><span /><span />
+      </div>
     </main>
   );
 }

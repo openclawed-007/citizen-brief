@@ -17,10 +17,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PatchPage({ params }: Props) {
   const { version } = await params;
+  let article;
   try {
-    const article = await getPatchArticle(decodeURIComponent(version));
-    return <PatchArticleView article={article} />;
+    article = await getPatchArticle(decodeURIComponent(version));
   } catch {
     notFound();
   }
+  return <PatchArticleView article={article} />;
 }

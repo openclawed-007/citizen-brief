@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { RoadmapCard, RoadmapRelease } from "@/lib/types";
 import { useFeed } from "./FeedProvider";
 import { FeatureEntry } from "./FeatureEntry";
@@ -13,10 +13,27 @@ export function CardDrawer({
   card: RoadmapCard | null;
   onClose: () => void;
 }) {
+  const closeButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!card) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeButton.current?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [card, onClose]);
+
   if (!card) return null;
   return (
     <div className="modal-back" onClick={onClose} role="presentation">
-      <div className="modal" role="dialog" aria-labelledby="card-title" onClick={(e) => e.stopPropagation()}>
+      <div className="modal" role="dialog" aria-modal="true" aria-labelledby="card-title" onClick={(e) => e.stopPropagation()}>
+        <button ref={closeButton} className="icon-btn modal-close" type="button" onClick={onClose} aria-label="Close details">×</button>
         <p className="eyebrow">
           {card.release} · {card.category}
         </p>
@@ -73,13 +90,11 @@ export function RoadmapView() {
   const [category, setCategory] = useState("All");
   const [open, setOpen] = useState<RoadmapCard | null>(null);
 
-  const columns = useMemo(() => {
-    const list: RoadmapRelease[] = [];
-    if (roadmap.current) list.push(roadmap.current);
-    roadmap.upcoming.slice(0, 1).forEach((r) => list.push(r));
-    if (roadmap.horizon) list.push(roadmap.horizon);
-    return list;
-  }, [roadmap]);
+  const columns: RoadmapRelease[] = [
+    ...(roadmap.current ? [roadmap.current] : []),
+    ...roadmap.upcoming.slice(0, 1),
+    ...(roadmap.horizon ? [roadmap.horizon] : []),
+  ];
 
   const cats = ["All", ...roadmap.categories];
 
@@ -87,11 +102,11 @@ export function RoadmapView() {
     <main id="content">
       <section className="page-hero">
         <div className="shell">
-          <p className="eyebrow">Public board</p>
-          <h1>Roadmap</h1>
+          <p className="eyebrow">Release view · Synced from RSI</p>
+          <h1>What’s next</h1>
           <p className="lede">
-            Current live column, the next patch, and Star Citizen 1.0 — copied from RSI Release
-            View whenever Cloud Imperium publishes a roundup.
+            See what is live, what is scheduled for the next release, and the path toward
+            Star Citizen 1.0 without digging through the full public board.
           </p>
           <div className="meta-row">
             {roadmap.lastUpdatedIso ? <span>Board updated {formatDateTime(roadmap.lastUpdatedIso)}</span> : null}

@@ -16,7 +16,7 @@ const FILTERS: { id: "all" | NewsKind; label: string }[] = [
 ];
 
 export function NewsList() {
-  const { feed } = useFeed();
+  const { feed, newsHref } = useFeed();
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["id"]>("all");
   const [q, setQ] = useState("");
   const items = useMemo(() => {
@@ -33,11 +33,11 @@ export function NewsList() {
     <main id="content">
       <section className="page-hero">
         <div className="shell">
-          <p className="eyebrow">RSI comm-links</p>
-          <h1>Transmissions</h1>
+          <p className="eyebrow">Official feed · Automatically updated</p>
+          <h1>Latest news</h1>
           <p className="lede">
-            Patch announcements, roadmap roundups, weekly notes, and letters from the
-            chairman — listed as they are published.
+            Patches, development reports, events, and announcements from RSI — organized
+            the moment they are published.
           </p>
         </div>
       </section>
@@ -63,7 +63,7 @@ export function NewsList() {
             ))}
           </div>
           {lead ? (
-            <Link href={`/news/${lead.id}`} className="lead-story">
+            <Link href={newsHref(lead)} className="lead-story">
               {lead.image ? <img src={lead.image} alt="" /> : <div className="ph" />}
               <div>
                 <span className="kind">{kindLabel(lead.kind)}</span>
@@ -76,7 +76,7 @@ export function NewsList() {
           )}
           <div className="index">
             {items.slice(1).map((item) => (
-              <Link key={item.id} href={`/news/${item.id}`}>
+              <Link key={item.id} href={newsHref(item)}>
                 <time>{item.publishedAt ? formatDate(item.publishedAt) : ""}</time>
                 <span className="kind">{kindLabel(item.kind)}</span>
                 <span className="name">{item.title}</span>

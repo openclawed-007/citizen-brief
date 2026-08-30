@@ -9,30 +9,36 @@ import {
   useRef,
   useState,
 } from "react";
-import type { Feed } from "@/lib/types";
-import { relativeTime, versionFromCode } from "@/lib/format";
+import type { Feed, NewsItem, PatchSummary } from "@/lib/types";
+import { relativeTime } from "@/lib/format";
 import { BASE_PATH } from "@/lib/paths";
-import { fetchCommLinks, fetchGameVersions, mapCommLink } from "@/lib/sources";
+
+const CHECK_INTERVAL_MS = 5 * 60 * 1000;
+const MAX_BACKOFF_MS = 60 * 60 * 1000;
 
 type Ctx = {
   feed: Feed;
   notice: string | null;
   dismiss: () => void;
   refreshing: boolean;
+  checkedAt: string;
   refresh: () => Promise<void>;
+  newsHref: (item: Pick<NewsItem, "id" | "url">) => string;
+  patchHref: (patch: Pick<PatchSummary, "version" | "wikiUrl">) => string;
 };
 
 const FeedContext = createContext<Ctx | null>(null);
 
-function mergeLive(base: Feed, overlay: Partial<Feed>): Feed {
-  const next: Feed = { ...base, ...overlay, live: { ...base.live, ...(overlay.live || {}) } };
-  next.fingerprint = [
-    next.live.code,
-    next.news[0]?.id,
-    next.roadmap.lastUpdated,
-    next.status.summary,
-  ].join("|");
-  return next;
+function isFeed(value: unknown): value is Feed {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Partial<Feed>;
+  return (
+    typeof candidate.fingerprint === "string" &&
+    typeof candidate.fetchedAt === "string" &&
+    Array.isArray(candidate.news) &&
+    Array.isArray(candidate.patches) &&
+    Boolean(candidate.live && candidate.roadmap && candidate.status)
+  );
 }
 
 export function FeedProvider({
@@ -45,8 +51,18 @@ export function FeedProvider({
   const [feed, setFeed] = useState(initial);
   const [notice, setNotice] = useState<string | null>(initial.notice);
   const [refreshing, setRefreshing] = useState(false);
+  const [checkedAt, setCheckedAt] = useState(initial.fetchedAt);
   const feedRef = useRef(feed);
-  feedRef.current = feed;
+  const refreshingRef = useRef(false);
+  const initialFetchedAt = Date.parse(initial.fetchedAt);
+  const lastCheckedRef = useRef(Number.isNaN(initialFetchedAt) ? 0 : initialFetchedAt);
+  const failuresRef = useRef(0);
+  const newsRoutesRef = useRef(new Set(initial.news.map((item) => item.id)));
+  const patchRoutesRef = useRef(new Set(initial.patches.map((patch) => patch.version)));
+
+  useEffect(() => {
+    feedRef.current = feed;
+  }, [feed]);
 
   const apply = useCallback((next: Feed) => {
     setFeed((prev) => {
@@ -73,73 +89,66 @@ export function FeedProvider({
   }, []);
 
   const refresh = useCallback(async () => {
+    if (refreshingRef.current) return;
+    refreshingRef.current = true;
     setRefreshing(true);
     try {
-      const [baked, versions, comms] = await Promise.all([
-        fetch(`${BASE_PATH}/feed.json?t=${Date.now()}`, { cache: "no-store" })
-          .then((r) => (r.ok ? (r.json() as Promise<Feed>) : null))
-          .catch(() => null),
-        fetchGameVersions().catch(() => null),
-        fetchCommLinks(40).catch(() => null),
-      ]);
+      // Visitors only revalidate our deployed snapshot. Upstream RSI/Wiki APIs are
+      // contacted once by the scheduled harvest, never once per open browser tab.
+      const response = await fetch(`${BASE_PATH}/feed.json`, {
+        cache: "no-cache",
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) throw new Error(`Feed check failed (${response.status})`);
+      const next: unknown = await response.json();
+      if (!isFeed(next)) throw new Error("Feed check returned an invalid snapshot");
 
-      let next = baked || feedRef.current;
-      if (comms && comms.length) {
-        next = mergeLive(next, { news: comms.map(mapCommLink), fetchedAt: new Date().toISOString() });
-      }
-      if (versions && versions.length) {
-        const liveRow = versions.find((v) => v.is_default) || versions[0];
-        next = mergeLive(next, {
-          live: {
-            ...next.live,
-            version: versionFromCode(liveRow.code),
-            build: liveRow.code,
-            code: liveRow.code,
-            channel: liveRow.channel,
-            releasedAt: liveRow.released_at,
-          },
-          patches: versions.map((v) => ({
-            version: versionFromCode(v.code),
-            build: v.code,
-            code: v.code,
-            channel: v.channel,
-            releasedAt: v.released_at,
-            isLive: Boolean(v.is_default),
-            title: `Star Citizen Alpha ${versionFromCode(v.code)}`,
-            wikiUrl: `https://starcitizen.tools/Update:Star_Citizen_Alpha_${versionFromCode(v.code)}`.replace(
-              / /g,
-              "_",
-            ),
-            rsiUrl: null,
-          })),
-          fetchedAt: new Date().toISOString(),
-        });
-      }
-      apply(next);
+      newsRoutesRef.current = new Set(next.news.map((item) => item.id));
+      patchRoutesRef.current = new Set(next.patches.map((patch) => patch.version));
+      failuresRef.current = 0;
+      setCheckedAt(new Date().toISOString());
+      if (next.fingerprint !== feedRef.current.fingerprint) apply(next);
+    } catch {
+      failuresRef.current += 1;
     } finally {
+      lastCheckedRef.current = Date.now();
+      refreshingRef.current = false;
       setRefreshing(false);
     }
   }, [apply]);
 
   useEffect(() => {
-    apply(initial);
-  }, [initial, apply]);
-
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      refresh().catch(() => undefined);
-    }, 60_000);
-    const onFocus = () => {
-      refresh().catch(() => undefined);
+    const checkIfStale = () => {
+      if (document.visibilityState !== "visible" || !navigator.onLine) return;
+      const backoff = Math.min(
+        CHECK_INTERVAL_MS * 2 ** failuresRef.current,
+        MAX_BACKOFF_MS,
+      );
+      if (Date.now() - lastCheckedRef.current >= backoff) {
+        refresh().catch(() => undefined);
+      }
     };
-    window.addEventListener("visibilitychange", onFocus);
-    window.addEventListener("focus", onFocus);
+    const id = window.setInterval(checkIfStale, 30_000);
+    checkIfStale();
+    window.addEventListener("visibilitychange", checkIfStale);
+    window.addEventListener("online", checkIfStale);
     return () => {
       window.clearInterval(id);
-      window.removeEventListener("visibilitychange", onFocus);
-      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("visibilitychange", checkIfStale);
+      window.removeEventListener("online", checkIfStale);
     };
   }, [refresh]);
+
+  const newsHref = useCallback(
+    (item: Pick<NewsItem, "id" | "url">) =>
+      newsRoutesRef.current.has(item.id) ? `/news/${item.id}` : item.url,
+    [],
+  );
+  const patchHref = useCallback(
+    (patch: Pick<PatchSummary, "version" | "wikiUrl">) =>
+      patchRoutesRef.current.has(patch.version) ? `/patches/${patch.version}` : patch.wikiUrl,
+    [],
+  );
 
   const value = useMemo(
     () => ({
@@ -147,9 +156,12 @@ export function FeedProvider({
       notice,
       dismiss: () => setNotice(null),
       refreshing,
+      checkedAt,
       refresh,
+      newsHref,
+      patchHref,
     }),
-    [feed, notice, refreshing, refresh],
+    [feed, notice, refreshing, checkedAt, refresh, newsHref, patchHref],
   );
 
   return <FeedContext.Provider value={value}>{children}</FeedContext.Provider>;
@@ -162,7 +174,7 @@ export function useFeed() {
 }
 
 export function useSyncedLabel() {
-  const { feed, refreshing } = useFeed();
-  if (refreshing) return "Checking official sources…";
-  return `Updated ${relativeTime(feed.fetchedAt)}`;
+  const { checkedAt, refreshing } = useFeed();
+  if (refreshing) return "Checking for updates…";
+  return `Checked ${relativeTime(checkedAt)}`;
 }

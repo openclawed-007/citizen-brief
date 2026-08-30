@@ -36,7 +36,6 @@ let feedBox: CacheBox<Feed> | null = null;
 let previousFeed: Feed | null = null;
 const patchBox = new Map<string, CacheBox<PatchArticle>>();
 const articleBox = new Map<number, CacheBox<NewsArticle>>();
-let timer: ReturnType<typeof setInterval> | null = null;
 
 function health(ok: boolean): SourceHealth {
   return ok ? "ok" : "error";
@@ -106,6 +105,17 @@ async function buildFeed(): Promise<Feed> {
 
   const versions = versionsRes.ok ? versionsRes.value : [];
   const commRaw = commRes.ok ? commRes.value : [];
+
+  // Versions and comm-links drive every generated route. A partial snapshot would
+  // publish dead links or erase known-good content, so fail the harvest and let the
+  // host keep serving the previous successful deployment instead.
+  if (!versionsRes.ok || versions.length === 0) {
+    throw new Error("Cannot publish without a valid game-version snapshot");
+  }
+  if (!commRes.ok || commRaw.length === 0) {
+    throw new Error("Cannot publish without a valid comm-link snapshot");
+  }
+
   const news = commRaw.map(mapCommLink);
   const liveRow = versions.find((v) => v.is_default) || versions[0];
   const liveVersion = liveRow ? versionFromCode(liveRow.code) : "—";
@@ -225,16 +235,7 @@ async function buildFeed(): Promise<Feed> {
   return feed;
 }
 
-export function ensureAutoRefresh() {
-  if (timer) return;
-  if (process.env.HARVEST === "1") return;
-  timer = setInterval(() => {
-    getFeed(true).catch(() => undefined);
-  }, TTL_MS);
-}
-
 export async function getFeed(force = false): Promise<Feed> {
-  ensureAutoRefresh();
   const now = Date.now();
   if (!force && feedBox && now - feedBox.at < TTL_MS) return feedBox.value;
   if (!force && feedBox?.inflight) return feedBox.value;
@@ -325,6 +326,19 @@ export async function getNewsArticle(id: number): Promise<NewsArticle | null> {
   };
   articleBox.set(id, { value: article, at: Date.now(), inflight: null });
   return article;
+}
+
+export function toPublicFeed(feed: Feed): Feed {
+  return {
+    ...feed,
+    roadmap: {
+      ...feed.roadmap,
+      upcoming: feed.roadmap.upcoming.slice(0, 2),
+      // current/upcoming/horizon already carry these cards. Avoid serializing a
+      // second copy into every HTML page and feed refresh.
+      releases: [],
+    },
+  };
 }
 
 export function emptyFeed(): Feed {

@@ -7,7 +7,7 @@ type Props = { params: Promise<{ id: string }> };
 
 export async function generateStaticParams() {
   const feed = await getFeed();
-  return feed.news.slice(0, 24).map((n) => ({ id: String(n.id) }));
+  return feed.news.map((n) => ({ id: String(n.id) }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

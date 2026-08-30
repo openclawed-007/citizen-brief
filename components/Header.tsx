@@ -9,10 +9,10 @@ import { ThemeToggle } from "./Theme";
 import { statusLabel, statusTone } from "@/lib/format";
 
 const LINKS = [
-  { href: "/", label: "Now" },
+  { href: "/", label: "Latest" },
+  { href: "/news", label: "News" },
   { href: "/patches", label: "Patches" },
   { href: "/roadmap", label: "Roadmap" },
-  { href: "/news", label: "Transmissions" },
 ];
 
 export function Header() {
@@ -52,12 +52,10 @@ export function Header() {
         <div className="mast">
           <Link href="/" className="brand" onClick={() => setOpen(false)}>
             <span className="brand-name">
-              Citizen<em> Brief</em>
+              <span className="brand-mark" aria-hidden>CB</span>
+              Citizen Brief
             </span>
-            <span className="brand-issue">
-              Issue {feed.live.version}
-              {feed.live.title ? ` · ${feed.live.title.replace(/"/g, "")}` : ""}
-            </span>
+            <span className="brand-issue">Star Citizen intelligence · Alpha {feed.live.version}</span>
           </Link>
           <nav className="nav" aria-label="Primary">
             {LINKS.map((l) => (
@@ -71,7 +69,7 @@ export function Header() {
             <ThemeToggle />
             <button
               className="menu-btn"
-              aria-label="Menu"
+              aria-label={open ? "Close navigation" : "Open navigation"}
               aria-expanded={open}
               onClick={() => setOpen((v) => !v)}
             >

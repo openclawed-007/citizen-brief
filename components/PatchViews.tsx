@@ -1,31 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
 import type { PatchArticle } from "@/lib/types";
 import { formatDate, relativeTime } from "@/lib/format";
 import { FeatureEntry } from "./FeatureEntry";
 import { useFeed } from "./FeedProvider";
 
 export function PatchList() {
-  const { feed } = useFeed();
+  const { feed, patchHref } = useFeed();
 
   return (
     <main id="content">
       <section className="page-hero">
         <div className="shell">
-          <p className="eyebrow">Live channel</p>
+          <p className="eyebrow">Build archive · Newest first</p>
           <h1>Patch notes</h1>
           <p className="lede">
-            Every published live build, newest first. Open a version for the full notes
-            and the roadmap cards that shipped with it.
+            The current live build and every recent release in one place, with official
+            notes and shipped roadmap items.
           </p>
         </div>
       </section>
       <section className="section">
         <div className="shell list">
           {feed.patches.map((p) => (
-            <Link key={p.code} href={`/patches/${p.version}`} className="row">
+            <Link key={p.code} href={patchHref(p)} className="row">
               <span className="ver">
                 {p.isLive ? <span className="live-flag">LIVE</span> : null} {p.version}
               </span>
@@ -39,19 +38,21 @@ export function PatchList() {
   );
 }
 
+function prepareArticle(source: string) {
+  const headings = [...source.matchAll(/<h2>([\s\S]*?)<\/h2>/gi)];
+  const toc = headings.map((match, index) => ({
+    id: `sec-${index}`,
+    title: String(match[1]).replace(/<[^>]+>/g, "").trim(),
+  }));
+  const html = headings.reduce(
+    (result, match, index) => result.replace(match[0], `<h2 id="sec-${index}">${match[1]}</h2>`),
+    source,
+  );
+  return { html, toc };
+}
+
 export function PatchArticleView({ article }: { article: PatchArticle }) {
-  const { html, toc } = useMemo(() => {
-    let i = 0;
-    const toc: { id: string; title: string }[] = [];
-    const html = article.html.replace(/<h2>([\s\S]*?)<\/h2>/gi, (_m, inner) => {
-      const id = `sec-${i}`;
-      const title = String(inner).replace(/<[^>]+>/g, "").trim();
-      toc.push({ id, title });
-      i += 1;
-      return `<h2 id="${id}">${inner}</h2>`;
-    });
-    return { html, toc };
-  }, [article.html]);
+  const { html, toc } = prepareArticle(article.html);
 
   return (
     <main id="content">

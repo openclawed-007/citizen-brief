@@ -17,7 +17,7 @@ import { CardDrawer } from "./RoadmapBoard";
 import { FeatureEntry } from "./FeatureEntry";
 
 export function HomeView() {
-  const { feed } = useFeed();
+  const { feed, newsHref, patchHref } = useFeed();
   const { live, status, stats, news, roadmap } = feed;
   const features = roadmap.current?.cards || [];
   const nextRel = roadmap.upcoming[0];
@@ -36,16 +36,17 @@ export function HomeView() {
       <section className="folio">
         <div className="shell">
           <nav className="jump" aria-label="On this page">
-            <a href="#patch">Patch notes</a>
-            <a href="#in-patch">In this patch</a>
+            <span>Briefing index</span>
+            <a href="#patch">Live build</a>
+            <a href="#in-patch">What shipped</a>
             {nextRel ? <a href="#next">Coming next</a> : null}
-            <a href="#posts">Transmissions</a>
+            <a href="#posts">Latest news</a>
           </nav>
 
           <div className="spread">
             <div>
-              <p className="eyebrow">Live environment</p>
-              <h1>Alpha {live.version}</h1>
+              <p className="eyebrow"><span className="live-pulse" /> Current live build</p>
+              <h1><span>Alpha</span> {live.version}</h1>
               <p className="title">{live.title}</p>
               <p className="lede">{live.summary}</p>
               <dl className="facts">
@@ -77,7 +78,10 @@ export function HomeView() {
                 </div>
               </dl>
               <div className="actions" id="patch">
-                <Link className="btn primary" href={`/patches/${live.version}`}>
+                <Link
+                  className="btn primary"
+                  href={patchHref({ version: live.version, wikiUrl: live.wikiUrl || "/patches" })}
+                >
                   Read the patch notes
                 </Link>
                 <Link className="btn" href="/roadmap">
@@ -102,9 +106,9 @@ export function HomeView() {
         <div className="shell">
           <div className="section-head">
             <div>
-              <p className="eyebrow">Catalog</p>
-              <h2>What shipped in {live.version}</h2>
-              <p>Each deliverable with its official still. Open one for the full brief.</p>
+              <p className="eyebrow">Inside the update</p>
+              <h2>What changed in {live.version}</h2>
+              <p>Official deliverables, translated into a quick, scannable briefing.</p>
             </div>
             <Link className="more" href="/roadmap">
               Full roadmap
@@ -149,15 +153,15 @@ export function HomeView() {
         <div className="shell">
           <div className="section-head">
             <div>
-              <p className="eyebrow">From RSI</p>
-              <h2>Latest transmissions</h2>
+              <p className="eyebrow">Latest signal</p>
+              <h2>News, as it lands</h2>
             </div>
             <Link className="more" href="/news">
-              All posts
+              View all news
             </Link>
           </div>
           {lead ? (
-            <Link href={`/news/${lead.id}`} className="lead-story">
+            <Link href={newsHref(lead)} className="lead-story">
               {lead.image ? <img src={lead.image} alt="" /> : <div className="ph" />}
               <div>
                 <span className="kind">{kindLabel(lead.kind)}</span>
@@ -168,7 +172,7 @@ export function HomeView() {
           ) : null}
           <div className="index">
             {news.slice(1, 8).map((item) => (
-              <Link key={item.id} href={`/news/${item.id}`}>
+              <Link key={item.id} href={newsHref(item)}>
                 <time>{item.publishedAt ? relativeTime(item.publishedAt) : ""}</time>
                 <span className="kind">{kindLabel(item.kind)}</span>
                 <span className="name">{item.title}</span>

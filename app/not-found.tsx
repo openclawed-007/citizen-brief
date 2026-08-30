@@ -10,13 +10,13 @@ export default function NotFound() {
       </p>
       <div className="actions">
         <Link className="btn primary" href="/">
-          Now
+          Latest briefing
         </Link>
         <Link className="btn" href="/patches">
           Patches
         </Link>
         <Link className="btn" href="/news">
-          Transmissions
+          News
         </Link>
       </div>
     </main>

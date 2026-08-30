@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 
 type Theme = "light" | "dark";
 
@@ -14,11 +14,7 @@ function readTheme(): Theme {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light");
-
-  useEffect(() => {
-    setTheme(readTheme());
-  }, []);
+  const [theme, setTheme] = useState<Theme>(readTheme);
 
   const apply = useCallback((next: Theme) => {
     document.documentElement.setAttribute("data-theme", next);
@@ -49,6 +45,7 @@ export function ThemeToggle() {
       onClick={toggle}
       aria-label={toDark ? "Switch to dark mode" : "Switch to light mode"}
       title={toDark ? "Dark mode" : "Light mode"}
+      suppressHydrationWarning
     >
       {toDark ? "Dark" : "Light"}
     </button>

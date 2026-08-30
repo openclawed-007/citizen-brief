@@ -1,9 +1,10 @@
 import { mkdir, writeFile } from "node:fs/promises";
-import { getFeed } from "../lib/feed";
+import { getFeed, toPublicFeed } from "../lib/feed";
 
 async function main() {
   process.env.HARVEST = "1";
-  const feed = await getFeed(true);
+  const fullFeed = await getFeed(true);
+  const feed = toPublicFeed(fullFeed);
   await mkdir("public", { recursive: true });
   await writeFile("public/feed.json", JSON.stringify(feed));
   await writeFile("public/.nojekyll", "");

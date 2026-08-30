@@ -17,9 +17,9 @@ This is an unofficial fan site. It is not affiliated with Cloud Imperium Games o
 
 ## How auto-update works
 
-1. **GitHub Actions** rebuilds the site every 20 minutes (and on every push), harvesting RSI + Wiki data into a fresh static snapshot.
-2. **The open tab** checks `feed.json` plus the public Star Citizen Wiki API every 60 seconds. New live builds and comm-links appear in place, with a banner when official information changes.
-3. **Refresh now** in the footer forces an immediate harvest from the browser.
+1. **GitHub Actions** rebuilds the site every 20 minutes (and on every push), making this single scheduled job the only consumer of RSI and Wiki APIs.
+2. **Open tabs** revalidate the site-owned `feed.json` at most every five minutes, only while visible and online. Failed checks use exponential backoff up to one hour.
+3. **Refresh now** checks the deployed snapshot without contacting upstream services. New builds and posts appear with an update banner after the next successful deployment.
 
 ## Run locally
 
