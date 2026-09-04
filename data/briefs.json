@@ -1,0 +1,458 @@
+{
+  "4.8.0": {
+    "hash": "beff14b44a52977d2ca03ec6",
+    "brief": {
+      "headline": "Star Citizen Alpha 4.8.0 'Tactical Strike' is live, adding a six-phase endgame assault contract, a g-force gear system, refueling overhauls, loadout recovery, and the Drake Ironclad.",
+      "takeaways": [
+        "New Tactical Strike Group endgame contract: a six-phase assault on a Nyx asteroid base for large organized squads of 7+ ships.",
+        "G-force tolerance now depends on worn gear: flight suits help, combat armor hurts, and combat flight suits add 15% damage mitigation.",
+        "Refueling gets dedicated United Wayfarers Club missions, a new operator mode, beacons, and 10 new pods/nozzles.",
+        "Ship loadouts can be saved as insured snapshots at ASOP terminals and claimed back for aUEC with a shorter cooldown.",
+        "Drake Ironclad and Ironclad Assault are added, using a new Command Module pairing mechanic; the Aegis Hammerhead gets a Gold Standard pass."
+      ],
+      "newContent": [
+        {
+          "title": "Tactical Strike Group (TSG) contract",
+          "detail": "A new endgame verified mercenary contract in Nyx. Large organized squads assault a fortified QV Extraction Station through six phases: escort the Idris Tranquility, destroy power relays with ballistics, destroy cooling units with energy weapons, destroy the core while defending T"
+        },
+        {
+          "title": "G-force tolerances and flight suits",
+          "detail": "G-force tolerance is now dynamically calculated from worn clothing and armor. Flight suits improve tolerance; light/medium combat armor reduces it; full heavy armor greatly reduces it. Combat flight suits provide 15% damage mitigation. Arena Commander race modes now spawn players"
+        },
+        {
+          "title": "Refueling missions and improvements",
+          "detail": "United Wayfarers Club refueling contracts are available for refueling ships like the Starfarer. New refueling beacons let stranded players call an AI Starfarer. Refueling operator mode, 10 new fuel pods/nozzles, rebalanced flow speeds, and a consolidated pod management UI are inc"
+        },
+        {
+          "title": "Item Recovery - Vehicle Loadouts",
+          "detail": "ASOP terminals can save a snapshot of a ship's current loadout. After destruction, players can claim the free manufacturer default with a longer cooldown or pay aUEC for the saved insured loadout with a shorter cooldown. Snapshots include equipped components, weapons, locker cont"
+        },
+        {
+          "title": "Drake Ironclad and Ironclad Assault",
+          "detail": "The Drake Ironclad lineup is introduced. These large logistics/combat ships require a docked Drake Command Module to be piloted. The Command Module pairing mechanic also applies to the Drake Caterpillar, with a System Migration Procedure on docking/undocking."
+        },
+        {
+          "title": "Aegis Hammerhead Gold Standard",
+          "detail": "The Hammerhead interior is reworked to Gold Standard quality, with new gravity generator room, personal storage lockers, corrected collision/visarea issues, fixed life support, pressurized turrets, and numerous UI/interaction fixes."
+        },
+        {
+          "title": "Capital Ship Hangar Service",
+          "detail": "Ships landed in the hangar of a supporting capital ship can request repair, restock, and refuel via MobiGlas. Available on the AI Idris in Tactical Strike Groups and on player Idris, Polaris, and 890 Jump; 600i Explorer and Carrack can restock ground vehicles."
+        }
+      ],
+      "fixes": [
+        {
+          "title": "Hammerhead Gold Standard fixes",
+          "detail": "Fixed missing collision on interior geometry, visarea and atmosphere problems in turrets, overloaded life support, cargo elevator UI offset, mirrored turret MFD prompts, power relay interaction prompts, component bay door issues, and audio cuts between zones."
+        },
+        {
+          "title": "Refueling system fixes",
+          "detail": "Nozzles can no longer be damaged by incorrect flow speed settings; flow speed is now fixed per nozzle. Valve control elements removed from pod management. Pod fill amounts now show current/total SCU."
+        },
+        {
+          "title": "ASOP and Vehicle Manager App changes",
+          "detail": "Vehicle Manager App no longer saves loadouts; saving is done at ASOP terminals. VMA now only displays vehicles at the player's current location. A limit of 25 ships delivered per location and a Local ships only view were added."
+        }
+      ],
+      "knownIssues": [],
+      "whoItAffects": [],
+      "watchouts": [
+        "Imprint/save your ship loadout at an ASOP terminal before leaving the hangar.",
+        "Use ballistic weapons on Power Relays; energy weapons are ineffective there.",
+        "Use energy weapons on Cooling Units and Core components.",
+        "Ships accumulate distortion damage inside superstructure trenches; intensity increases in the core chamber.",
+        "Combat armor reduces g-force tolerance; flight suits improve it.",
+        "Refueling contracts: AI ships are passive and will never initiate docking; you must send the docking request."
+      ]
+    },
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "at": "2026-09-04T04:03:17.798Z"
+  },
+  "4.10.0": {
+    "hash": "bba2946ff53f50c708075f8d",
+    "brief": {
+      "headline": "Star Citizen Alpha 4.10.0 is now live, bringing Siege of Orison as an instanced FPS mission, new gear, fuel and armor rebalances, and a broad wave of fixes.",
+      "takeaways": [
+        "Siege of Orison now runs as an instanced, up-to-4-player FPS mission with new checkpoints, Nine Tails armor, and rewards including a custom weapon skin.",
+        "Fuel tanks and consumption were rebalanced, fuel prices increased, and refueling missions were updated to match.",
+        "Destroyed vehicle armor no longer reduces damage, and vehicle weapon balance saw changes to gatlings and the Combine Cannon.",
+        "New gear added: BUL-H4 Super Heavy Armor, Vendetta HMG, and the HDGW Arlington lever-action rifle.",
+        "Instancing debuts in the Persistent Universe, with Siege of Orison and Recco Battaglia's office as the first instance-based content."
+      ],
+      "newContent": [
+        {
+          "title": "Siege of Orison V2: Instancing on Demand mission, up to 4 players, reworked FPS-only platf",
+          "detail": ""
+        },
+        {
+          "title": "Recco Battaglia added as a mission giver at Louge, starting a story line covering independ",
+          "detail": ""
+        },
+        {
+          "title": "Wikelo Emporium now has new exchanges: a snow camo variant of BUL-H4 armor, a matching Ven",
+          "detail": ""
+        },
+        {
+          "title": "Global loot pass: weapon caches carry more than double items, large weapon attachments are",
+          "detail": ""
+        },
+        {
+          "title": "After 4.10, ore and commodity containers now persist in Long Term Persistence (in-game pur",
+          "detail": ""
+        },
+        {
+          "title": "New playable item: the BUL-H4 Super Heavy Armor set with helmet and ammo backpack, paired ",
+          "detail": ""
+        },
+        {
+          "title": "New FPS weapon: the HDGW Arlington Rifle with DMR and shotgun fire modes, customatically b",
+          "detail": ""
+        },
+        {
+          "title": "Instancing arrives in the Persistent Universe: players and parties get private spaces for ",
+          "detail": ""
+        }
+      ],
+      "fixes": [
+        {
+          "title": "Hauling and cargo contracts",
+          "detail": "Fixed missing mission cargo, freight elevator kiosk issues, missions without cooldown, and zone requests in multi-location hauling contracts."
+        },
+        {
+          "title": "Bounty and combat contracts",
+          "detail": "Fixed hostiles not spawning in Pyro outposts and surface encounters, security patrol progress, Expel Outlaws completion, and friendly NPCs despawning in bunker defenses."
+        },
+        {
+          "title": "Escort and ship battle contracts",
+          "detail": "Fixed hangar doors not opening for escort ships, escorted ship not flying away, missing escorted ships, and wrong faction reputation from Foxwell and Hurston battles."
+        },
+        {
+          "title": "Tactical Strike Group",
+          "detail": "Fixed Vanduul fighters not spawning, dormant Scythes, missions stalling at Go To, turret firing angles, and missing 60-minute cooldown."
+        },
+        {
+          "title": "Refuelling contracts",
+          "detail": "Fixed the Refuel Request objective progression, docking request acceptance, shooting the target not failing the mission, and missing audio from the mission giver."
+        },
+        {
+          "title": "Mining and industrial contracts",
+          "detail": "Fixed Industrial Resource Gathering not completing if a party member delivered the item, and scan/mine markers appearing incorrectly."
+        },
+        {
+          "title": "Investigation and delving",
+          "detail": "Fixed misdirected mission objectives, card/drive rejects at freight elevators, and unusable transit elevators blocking progress."
+        },
+        {
+          "title": "Creature contracts",
+          "detail": "Fixed the Highpoint Wilderness intro mission stuck active and Valakkar not emerging from the ground after egg placement."
+        }
+      ],
+      "knownIssues": [],
+      "whoItAffects": [],
+      "watchouts": [
+        "Always save your ship loadout before heading out.",
+        "Siege of Orison is a 4-player instanced mission: party leader is the instance owner and entry checks apply.",
+        "The new super-heavy armor and Vendetta magazines/loot only come through Wikelo exchanges or Siege of Orison. The H4-PBF ammo backpack can only store the new Magna ammo, and must be",
+        "Hydrogen/quantum fuel prices are significantly higher.",
+        "Instanced hall that if it cannot be created, you'll get a banner rather than a silent fail.",
+        "Wikelo's hangar cannot store ships; if you choose 'Now' your ship will be sent home, and if you leave anything in the hangar it will be returned automatically."
+      ]
+    },
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "at": "2026-09-04T04:06:58.569Z"
+  },
+  "4.9.0": {
+    "hash": "2d2d1b6fb4544485acae5f92",
+    "brief": {
+      "headline": "Star Citizen Alpha 4.9.0 'Frontier Tensions' launches with new Recco Battaglia missions, ship combat hit markers, and a new FPS rifle.",
+      "takeaways": [
+        "New repeatable missions from Recco Battaglia offer reputation rewards including exclusive armor, weapon blueprints, and unique ship variants.",
+        "Ship combat now features visual and audio hit markers to indicate shield, armor, hull, and component damage.",
+        "Ballistic repeaters and several cannons have been rebalanced; mining laser power increased by 20%.",
+        "New Behring CQ7 Bullpup Rifle and Bellator Combat Suit added to the Persistent Universe.",
+        "Abandoned ships will now be cleaned up after 5 hours at major landing zones and stations."
+      ],
+      "newContent": [
+        {
+          "title": "New missions from Recco Battaglia (prospecting, mining, recovery, salvage, investigations,",
+          "detail": ""
+        },
+        {
+          "title": "Ordnance Cargo Holder: bounding box frames for missiles/torpedoes on cargo grids.",
+          "detail": ""
+        },
+        {
+          "title": "Freight Elevator Kiosk updates: 'Show External' checkbox, claim tooltips, improved partial",
+          "detail": ""
+        },
+        {
+          "title": "Experimental scanning updates for easier material scanning.",
+          "detail": ""
+        },
+        {
+          "title": "Ship mining laser power increased by ~20%.",
+          "detail": ""
+        },
+        {
+          "title": "Behring CQ7 Bullpup Rifle and ammo added to shops and missions.",
+          "detail": ""
+        },
+        {
+          "title": "Tractor beams usable inside armistice zones at Distribution Centers.",
+          "detail": ""
+        },
+        {
+          "title": "Grenade HUD markers for live grenades.",
+          "detail": ""
+        }
+      ],
+      "fixes": [
+        {
+          "title": "Fixed multiple mission progression issues (Tactical Strike Group, ASD Delving, Bombing Run",
+          "detail": ""
+        },
+        {
+          "title": "Fixed docking collar issues preventing docking at stations and refueling ships.",
+          "detail": ""
+        },
+        {
+          "title": "Fixed Idris main laser not dealing damage and dead spots against 890 Jump.",
+          "detail": ""
+        },
+        {
+          "title": "Fixed Gatac Railen exploding instead of entering disabled state.",
+          "detail": ""
+        },
+        {
+          "title": "Fixed Drake Command Module undocking during flight.",
+          "detail": ""
+        },
+        {
+          "title": "Fixed inventory becoming inaccessible and equipment slot icon disappearing.",
+          "detail": ""
+        },
+        {
+          "title": "Fixed freight elevator 'overloaded' error and 'Loading Contents' stuck state.",
+          "detail": ""
+        },
+        {
+          "title": "Fixed live grenades not showing HUD warning marker.",
+          "detail": ""
+        }
+      ],
+      "knownIssues": [
+        {
+          "title": "Known Issues and Workarounds",
+          "detail": "For a comprehensive up-to-date list of known issues and workarounds, please check the Knowledge Base."
+        }
+      ],
+      "whoItAffects": [],
+      "watchouts": [
+        "Ballistic repeaters have been significantly reduced in damage.",
+        "Some cannons have increased damage but slower fire rates and reduced armor penetration.",
+        "Abandoned ships will be cleaned up after 5 hours at major locations.",
+        "Commodity kiosks removed from Dumper's Depot and Platinum Bay – use item kiosks instead.",
+        "Full fuel pods removed from shops to avoid confusion with empty ones."
+      ]
+    },
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "at": "2026-09-04T04:07:53.604Z"
+  },
+  "4.8.1": {
+    "hash": "fc0193ac9932a135fe041958",
+    "brief": {
+      "headline": "Star Citizen Alpha 4.8.1 launches Defend Location ship combat missions across Stanton, Pyro, and Nyx.",
+      "takeaways": [
+        "New Defend Location missions are now live in the persistent universe.",
+        "Ship Battles V3 introduces a combined defense and escort archetype.",
+        "Missions are available at 149 asteroid mining bases across Stanton and Pyro.",
+        "Rewards include aUEC, faction reputation, scrip, and blueprints at higher tiers.",
+        "Escort missions from V2 get Ace Pilot spawns and varied flight paths."
+      ],
+      "newContent": [
+        {
+          "title": "Defend Location Missions",
+          "detail": "New ship combat missions where players intercept enemy bombers attacking fuel storage and critical infrastructure at asteroid mining bases. Available via Contract Manager across Stanton and Pyro, with 385 total locations across 149 bases. Difficulty ranges from Very Easy to Super"
+        },
+        {
+          "title": "Combined Defense and Escort Archetype",
+          "detail": "Ship Battles V3 adds a combined mission type that layers an escort objective on top of defense. While defending against bombers, a friendly ship launches or lands, and hostile fighters target it. Both objectives must be completed to succeed; failing either ends the mission. Desig"
+        },
+        {
+          "title": "Escort Ship Archetype Updates",
+          "detail": "The existing Escort Ship archetype from V2 receives Ace Pilot spawns and more varied flight paths, increasing difficulty and reducing predictability for veteran players."
+        }
+      ],
+      "fixes": [],
+      "knownIssues": [],
+      "whoItAffects": [],
+      "watchouts": [
+        "Combined defense and escort missions are more demanding and require completing both objectives.",
+        "Reputation gates may lock some missions until requirements are met.",
+        "Foxwell contracts require completing the intro mission first.",
+        "Personal cooldown of 15 minutes applies after abandoning or completing a mission."
+      ]
+    },
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "at": "2026-09-04T04:10:28.653Z"
+  },
+  "4.7.2": {
+    "hash": "5c38a26ca220d9ce9d4c3425",
+    "brief": {
+      "headline": "Alpha 4.7.2 launches Nyx Mission Pack 2 with new courier, cargo recovery, combat, bounty, bombing run, and salvage contracts.",
+      "takeaways": [
+        "New criminal factions in Nyx disrupt operations, prompting a wave of new contracts.",
+        "Mission types span combat, courier, cargo recovery, salvage, and bombing runs across Nyx and Stanton.",
+        "Bombing Run missions return to the Persistent Universe with lawful and unlawful variants.",
+        "Adagio offers paid salvage contracts across all systems.",
+        "Bounty contracts target criminal vessels near Rock Cracker sites in Nyx."
+      ],
+      "newContent": [
+        {
+          "title": "Nyx Mission Pack 2",
+          "detail": "New criminal factions have established themselves in Nyx, leading to a new wave of contracts across multiple archetypes and organizations, covering combat, courier work, cargo recovery, salvage, and more in Nyx and Stanton."
+        },
+        {
+          "title": "Delivery: Courier",
+          "detail": "New courier contracts available from organizations across Stanton and Nyx, involving local delivery of 2-handed deliverables between outposts, stations, and landing zones."
+        },
+        {
+          "title": "Delivery: Recover Cargo",
+          "detail": "Recover Cargo contracts task players with locating and retrieving lost or abandoned cargo from ships in space, ranging from 1 SCU crate up to 6 one-SCU boxes, and returning it to the issuing organization."
+        },
+        {
+          "title": "Combat: Ship Wave Attack",
+          "detail": "Intercept and eliminate coordinated waves of hostile ships in Nyx and Pyro space. Enemy fighter groups arrive in sequences, and players must clear each wave before the next is triggered."
+        },
+        {
+          "title": "Bounty: Bounty (Kill Ship)",
+          "detail": "Bounty contracts now available in Nyx targeting specific criminal vessels near Rock Cracker sites. Locate and destroy the marked target to collect the reward."
+        },
+        {
+          "title": "Combat: Bombing Run",
+          "detail": "Reimplementation of Bombing Run missions into the PU. Destroy fuel infrastructure and critical installations at enemy-held asteroid bases and distribution centers in Stanton. Targets are defended by hostile ships and turrets. Available in lawful and unlawful variants."
+        },
+        {
+          "title": "Salvage: Paid Salvage",
+          "detail": "Adagio is issuing lawful paid salvage contracts across all systems, directing players to the location of a derelict vessel to be stripped and processed."
+        }
+      ],
+      "fixes": [],
+      "knownIssues": [],
+      "whoItAffects": [],
+      "watchouts": [
+        "Bombing Run targets are defended by hostile ships and turrets; all marked objectives must be eliminated.",
+        "Ship Wave Attack missions require clearing sequential waves before the next triggers.",
+        "Recover Cargo contracts may involve up to 6 one-SCU boxes, requiring careful cargo management.",
+        "Bounty targets are near Rock Cracker sites in Nyx, which may be hazardous zones."
+      ]
+    },
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "at": "2026-09-04T04:10:34.395Z"
+  },
+  "4.7.0": {
+    "hash": "a94b147e22d24f66a09cedb5",
+    "brief": {
+      "headline": "Star Citizen Alpha 4.7.0 'Welcome to the Rock' launches with Operation Breaker Stations, a full inventory rework, crafting via the Item Fabricator, the RSI Aurora Mk II, and a large wave of fixes.",
+      "takeaways": [
+        "New Operation Breaker Station missions in Nyx task players with rebooting QV Breaker Stations to access mineral-rich asteroid cores, with exclusive or shared access options.",
+        "The inventory system is fully redesigned with a two-panel layout, nearby inventory tabs, an equipment panel, paper doll, search/sort/filter, and a Stack All button.",
+        "Crafting arrives via the deployable Item Fabricator, using account-bound blueprints, quality-based materials, and separate crafting/dismantling queues.",
+        "The RSI Aurora Mk II is added to the Persistent Universe, alongside new radar variants, shield/armor rebalances, and new ship rentals.",
+        "Over 150 bug and crash fixes are included since 4.6.0, covering missions, locations, vehicles, stability, and more."
+      ],
+      "newContent": [
+        {
+          "title": "Operation Breaker Station missions in Nyx: reboot QV Breaker Stations to access mineral re",
+          "detail": ""
+        },
+        {
+          "title": "Fully redesigned inventory system with two-panel layout, nearby inventory tabs, equipment ",
+          "detail": ""
+        },
+        {
+          "title": "Crafting system with the deployable Item Fabricator, blueprints, material quality, craftin",
+          "detail": ""
+        },
+        {
+          "title": "Material distribution overhaul for ship and FPS mineables, including new minerals, quality",
+          "detail": ""
+        },
+        {
+          "title": "New ship: RSI Aurora Mk II.",
+          "detail": ""
+        },
+        {
+          "title": "New radar variants from Basilisk, CHCO, Garuda/Gorenberg, Navegante, and Wilon, with aim a",
+          "detail": ""
+        },
+        {
+          "title": "New Wikelo ship offering: RSI Apollo Triage with upgraded components and unique base liver",
+          "detail": ""
+        },
+        {
+          "title": "New Size 3 neutron weapon: MaxOx NN-15 Cannon.",
+          "detail": ""
+        }
+      ],
+      "fixes": [
+        {
+          "title": "Fixed a main-thread deadlock, plus 8 client crash fixes and 9 server crash fixes.",
+          "detail": ""
+        },
+        {
+          "title": "Fixed Starmap zooming into the ship while in a cockpit.",
+          "detail": ""
+        },
+        {
+          "title": "Fixed fire damage to players being much lower than intended.",
+          "detail": ""
+        },
+        {
+          "title": "Fixed multiple Industrial mission issues: incorrect drop-off locations, wrong material req",
+          "detail": ""
+        },
+        {
+          "title": "Fixed Recover Cargo VIP Milestone showing 'Deliver 0/0 cargo'.",
+          "detail": ""
+        },
+        {
+          "title": "Fixed Killship mission progression and enemy AI spawning outside the action area.",
+          "detail": ""
+        },
+        {
+          "title": "Fixed Nyx QV Station NPC carrying the Data Packet at the Polaris failing to spawn.",
+          "detail": ""
+        },
+        {
+          "title": "Fixed Hauling contracts listing 'Potential Wildlife Location' as destination.",
+          "detail": ""
+        }
+      ],
+      "knownIssues": [
+        {
+          "title": "Incomplete patch note for Argo Moth",
+          "detail": "The official notes list a fix for the Argo Moth where the pilot would lose control, but the note is cut off and does not specify the full resolution."
+        }
+      ],
+      "whoItAffects": [
+        "Players running missions in Nyx, especially Operation Breaker Station and hunting missions.",
+        "All players using the redesigned inventory and nearby inventory tabs.",
+        "Players interested in crafting, mining, material quality, and the Item Fabricator.",
+        "Pilots and ship owners affected by shield, armor, radar, life support, and thruster balance changes.",
+        "VR users testing the experimental VR feature.",
+        "Players who customize their character with new hairstyles or use the new social stations in Nyx."
+      ],
+      "watchouts": [
+        "Mineable rock SCU amounts are reduced overall, especially for high-value resources.",
+        "Armor changes mean smaller-caliber weapons may struggle against heavily armored ships until armor is worn down.",
+        "Radar power demand is increased, and aim assist range now depends on the installed radar.",
+        "Life support costs more to maintain atmosphere and exchange rates between rooms are decreased.",
+        "Two players cannot open the same inventory at the same time; tabs appear greyed out.",
+        "Crafting material quality affects item stats, and some blueprints may give negative stats below a quality threshold."
+      ]
+    },
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "at": "2026-09-04T04:11:04.387Z"
+  }
+}

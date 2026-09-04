@@ -192,6 +192,13 @@ export async function briefForPatch(version: string, title: string, html: string
   }
 
   const brief = await requestBrief(version, title, notes);
+  if (!brief) {
+    if (hit?.brief) return hit.brief;
+    store[version] = { hash, brief: null, model: BRIEF_MODEL, at: new Date().toISOString() };
+    cache = store;
+    await saveBriefCache();
+    return null;
+  }
   store[version] = { hash, brief, model: BRIEF_MODEL, at: new Date().toISOString() };
   cache = store;
   await saveBriefCache();

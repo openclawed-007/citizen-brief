@@ -35,9 +35,6 @@ yarn-error.log*
 .env*
 !.env.example
 
-# generated patch briefs (hashed cache)
-/data/briefs.json
-
 # vercel
 .vercel
 
