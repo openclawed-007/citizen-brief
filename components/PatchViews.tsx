@@ -5,6 +5,7 @@ import type { PatchArticle } from "@/lib/types";
 import { formatDate, relativeTime } from "@/lib/format";
 import { FeatureEntry } from "./FeatureEntry";
 import { useFeed } from "./FeedProvider";
+import { PatchBriefing } from "./PatchBriefing";
 
 export function PatchList() {
   const { feed, patchHref } = useFeed();
@@ -84,6 +85,8 @@ export function PatchArticleView({ article }: { article: PatchArticle }) {
           </div>
         </div>
       </section>
+
+      {article.brief ? <PatchBriefing brief={article.brief} /> : null}
 
       {article.cards.length > 0 ? (
         <section className="section">

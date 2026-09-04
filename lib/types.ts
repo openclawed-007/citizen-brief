@@ -109,6 +109,21 @@ export type PatchSummary = {
   rsiUrl: string | null;
 };
 
+export type BriefItem = {
+  title: string;
+  detail: string;
+};
+
+export type PatchBrief = {
+  headline: string;
+  takeaways: string[];
+  newContent: BriefItem[];
+  fixes: BriefItem[];
+  knownIssues: BriefItem[];
+  whoItAffects: string[];
+  watchouts: string[];
+};
+
 export type PatchArticle = PatchSummary & {
   html: string;
   summary: string;
@@ -117,6 +132,7 @@ export type PatchArticle = PatchSummary & {
   publishDate: string | null;
   cards: RoadmapCard[];
   source: "wiki" | "comm-link" | "roadmap";
+  brief: PatchBrief | null;
 };
 
 export type Feed = {

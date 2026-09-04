@@ -2,6 +2,7 @@ import { readFile, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { getPatchArticle } from "../lib/feed";
 import { htmlLooksBroken, inlineFormat, wikiToHtml } from "../lib/wiki";
+import { normalizeBrief, notesToText, shouldBrief } from "../lib/brief";
 import { rankSearch, type SearchCandidate } from "../lib/search";
 
 const issues: string[] = [];
@@ -77,6 +78,21 @@ async function main() {
     "Smart search always offers useful fallbacks",
     "Smart search rendered an empty suggestion list",
   );
+
+  const parsed = normalizeBrief({
+    headline: "Instancing arrives with Siege of Orison.",
+    takeaways: ["New instanced mission", "Balance pass", "Known issues remain"],
+    newContent: [{ title: "Siege of Orison", detail: "On-demand instancing." }],
+    fixes: [],
+    knownIssues: [{ title: "Queue", detail: "Long waits at peak." }],
+    whoItAffects: ["FPS players"],
+    watchouts: ["Bring a medical ship"],
+  });
+  assert(Boolean(parsed?.headline && parsed.takeaways.length === 3), "Brief JSON is accepted when complete", "Brief JSON rejected a valid payload");
+  assert(normalizeBrief({ headline: "x" }) === null, "Brief JSON rejects incomplete model output", "Brief JSON accepted incomplete output");
+  assert(notesToText("<script>alert(1)</script><h2>Ships</h2><p>Idris added</p>").includes("Ships"), "Brief text extract keeps headings", "Brief text extract dropped headings");
+  assert(!notesToText("<script>alert(1)</script><p>Idris</p>").includes("alert"), "Brief text extract drops scripts", "Brief text extract kept script text");
+  assert(shouldBrief(0, false) && shouldBrief(99, true) && !shouldBrief(99, false), "Only live and recent patches are briefed", "Brief selection is too wide");
 
   const browserProvider = await readFile(
     join(process.cwd(), "components", "FeedProvider.tsx"),

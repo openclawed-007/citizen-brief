@@ -26,10 +26,15 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - uses: actions/cache@v4
+        with:
+          path: data/briefs.json
+          key: patch-briefs-v1
       - name: Harvest official sources and export
         env:
           STATIC_EXPORT: "1"
           NEXT_PUBLIC_BASE_PATH: /citizen-brief
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
