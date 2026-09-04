@@ -118,8 +118,21 @@ export async function loadBriefCache(): Promise<CacheFile> {
 
 export async function saveBriefCache(): Promise<void> {
   if (!cache) return;
+  let disk: CacheFile = {};
+  try {
+    disk = JSON.parse(await readFile(CACHE_PATH, "utf8")) as CacheFile;
+  } catch {
+    disk = {};
+  }
+  const merged: CacheFile = { ...disk };
+  for (const [version, row] of Object.entries(cache)) {
+    const previous = merged[version];
+    if (!row.brief && previous?.brief) continue;
+    merged[version] = row;
+  }
+  cache = merged;
   await mkdir("data", { recursive: true });
-  await writeFile(CACHE_PATH, `${JSON.stringify(cache, null, 2)}\n`);
+  await writeFile(CACHE_PATH, `${JSON.stringify(merged, null, 2)}\n`);
 }
 
 function apiKey(): string {
