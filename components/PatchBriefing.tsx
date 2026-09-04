@@ -17,7 +17,26 @@ function BriefList({ title, items }: { title: string; items: BriefItem[] }) {
   );
 }
 
-export function PatchBriefing({ brief }: { brief: PatchBrief }) {
+export function PatchBriefing({ brief }: { brief: PatchBrief | null }) {
+  if (!brief) {
+    return (
+      <section className="section brief-section" aria-labelledby="patch-brief-title">
+        <div className="shell">
+          <article className="brief-card brief-card-empty">
+            <div className="brief-card-head">
+              <p className="eyebrow">Desk briefing</p>
+              <h2 id="patch-brief-title">Briefing isn&apos;t available yet</h2>
+              <p className="brief-headline">
+                The summary did not come back in time. Official notes below are still current.
+              </p>
+            </div>
+            <p className="brief-note">This page will fill in on a later harvest if the model responds in time.</p>
+          </article>
+        </div>
+      </section>
+    );
+  }
+
   const hasDetails =
     brief.newContent.length + brief.fixes.length + brief.knownIssues.length + brief.whoItAffects.length + brief.watchouts.length >
     0;

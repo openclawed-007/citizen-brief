@@ -310,10 +310,12 @@ export async function getPatchArticle(version: string): Promise<PatchArticle> {
     cards: release?.cards || [],
     source,
     brief: null,
+    wantsBrief: false,
   };
 
   const index = feed.patches.findIndex((p) => p.version === key);
-  if (shouldBrief(index < 0 ? 99 : index, article.isLive)) {
+  article.wantsBrief = shouldBrief(index < 0 ? 99 : index, article.isLive);
+  if (article.wantsBrief) {
     article.brief = await briefForPatch(key, article.title, article.html);
   }
 

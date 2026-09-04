@@ -86,7 +86,7 @@ export function PatchArticleView({ article }: { article: PatchArticle }) {
         </div>
       </section>
 
-      {article.brief ? <PatchBriefing brief={article.brief} /> : null}
+      {article.wantsBrief ? <PatchBriefing brief={article.brief} /> : null}
 
       {article.cards.length > 0 ? (
         <section className="section">

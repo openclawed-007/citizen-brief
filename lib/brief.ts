@@ -5,12 +5,13 @@ import type { BriefItem, PatchBrief } from "./types";
 
 export const BRIEF_MODEL = "deepseek/deepseek-v4-flash-0731";
 export const MAX_BRIEF_PATCHES = 8;
+export const REQUEST_TIMEOUT_MS = 10_000;
+export const MISS_TTL_MS = 10 * 60 * 1000;
 const MAX_NOTES_CHARS = 24_000;
 const MAX_OUTPUT_TOKENS = 1_800;
-const REQUEST_TIMEOUT_MS = 90_000;
 const CACHE_PATH = "data/briefs.json";
 
-type CacheFile = Record<string, { hash: string; brief: PatchBrief; model: string; at: string }>;
+type CacheFile = Record<string, { hash: string; brief: PatchBrief | null; model: string; at: string }>;
 
 let cache: CacheFile | null = null;
 let envLoaded = false;
@@ -184,10 +185,13 @@ export async function briefForPatch(version: string, title: string, html: string
   const hash = notesHash(html);
   const store = await loadBriefCache();
   const hit = store[version];
-  if (hit && hit.hash === hash && hit.brief) return hit.brief;
+  if (hit && hit.hash === hash) {
+    if (hit.brief) return hit.brief;
+    const age = Date.now() - Date.parse(hit.at);
+    if (Number.isFinite(age) && age < MISS_TTL_MS) return null;
+  }
 
-  const brief = (await requestBrief(version, title, notes)) || (await requestBrief(version, title, notes));
-  if (!brief) return hit?.brief || null;
+  const brief = await requestBrief(version, title, notes);
   store[version] = { hash, brief, model: BRIEF_MODEL, at: new Date().toISOString() };
   cache = store;
   await saveBriefCache();

@@ -2,7 +2,7 @@ import { readFile, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { getPatchArticle } from "../lib/feed";
 import { htmlLooksBroken, inlineFormat, wikiToHtml } from "../lib/wiki";
-import { normalizeBrief, notesToText, shouldBrief } from "../lib/brief";
+import { normalizeBrief, notesToText, REQUEST_TIMEOUT_MS, shouldBrief } from "../lib/brief";
 import { rankSearch, type SearchCandidate } from "../lib/search";
 
 const issues: string[] = [];
@@ -93,6 +93,13 @@ async function main() {
   assert(notesToText("<script>alert(1)</script><h2>Ships</h2><p>Idris added</p>").includes("Ships"), "Brief text extract keeps headings", "Brief text extract dropped headings");
   assert(!notesToText("<script>alert(1)</script><p>Idris</p>").includes("alert"), "Brief text extract drops scripts", "Brief text extract kept script text");
   assert(shouldBrief(0, false) && shouldBrief(99, true) && !shouldBrief(99, false), "Only live and recent patches are briefed", "Brief selection is too wide");
+  assert(REQUEST_TIMEOUT_MS <= 10_000, "Brief requests time out quickly", `Brief timeout is too long: ${REQUEST_TIMEOUT_MS}`);
+  const briefingUi = await readFile(join(process.cwd(), "components", "PatchBriefing.tsx"), "utf8");
+  assert(
+    briefingUi.includes("Briefing isn&apos;t available yet") && briefingUi.includes("brief: PatchBrief | null"),
+    "Patch pages show an unavailable briefing when the model misses",
+    "Patch briefing UI does not handle a missing model response",
+  );
 
   const browserProvider = await readFile(
     join(process.cwd(), "components", "FeedProvider.tsx"),
@@ -107,7 +114,9 @@ async function main() {
   );
 
   process.env.HARVEST = "1";
+  process.env.OPENROUTER_API_KEY = "";
   const article = await getPatchArticle("4.10.0");
+  assert(article.wantsBrief === true, "Live patch asks for a desk briefing", "Live patch did not request a briefing");
   const liveIssues = htmlLooksBroken(article.html);
   assert(
     liveIssues.length === 0,

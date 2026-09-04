@@ -32,7 +32,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Patch pages can include a desk briefing (headline, takeaways, then a closed "full organised notes" section). That is generated at harvest/build time from the official notes via OpenRouter (`deepseek/deepseek-v4-flash-0731`). Visitors never call the model, so it cannot be used as a public chatbot. Set `OPENROUTER_API_KEY` in `.env.local` for local harvest, and as the GitHub Actions secret of the same name for deploys. Unchanged notes are cached in `data/briefs.json`.
+Patch pages can include a desk briefing (headline, takeaways, then a closed "full organised notes" section). That is generated at harvest/build time from the official notes via OpenRouter (`deepseek/deepseek-v4-flash-0731`). If the model does not respond within 10 seconds, the page still ships and says the briefing is not available. Visitors never call the model, so it cannot be used as a public chatbot. Set `OPENROUTER_API_KEY` in `.env.local` for local harvest, and as the GitHub Actions secret of the same name for deploys. Unchanged notes are cached in `data/briefs.json`.
 
 Static production build:
 
