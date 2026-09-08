@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { RoadmapCard, RoadmapRelease } from "@/lib/types";
 import { useFeed } from "./FeedProvider";
+import { Modal } from "./Modal";
 import { FeatureEntry } from "./FeatureEntry";
 import { formatDateTime } from "@/lib/format";
 
@@ -13,27 +14,11 @@ export function CardDrawer({
   card: RoadmapCard | null;
   onClose: () => void;
 }) {
-  const closeButton = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    if (!card) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    closeButton.current?.focus();
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [card, onClose]);
-
   if (!card) return null;
   return (
-    <div className="modal-back" onClick={onClose} role="presentation">
-      <div className="modal" role="dialog" aria-modal="true" aria-labelledby="card-title" onClick={(e) => e.stopPropagation()}>
-        <button ref={closeButton} className="icon-btn modal-close" type="button" onClick={onClose} aria-label="Close details">×</button>
+    <Modal className="modal-back" labelledBy="card-title" onClose={onClose}>
+      <div className="modal">
+        <button autoFocus className="icon-btn modal-close" type="button" onClick={onClose} aria-label="Close details">×</button>
         <p className="eyebrow">
           {card.release} · {card.category}
         </p>
@@ -50,7 +35,7 @@ export function CardDrawer({
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -129,6 +114,7 @@ export function RoadmapView() {
               <button
                 key={c}
                 className={category === c ? "chip on" : "chip"}
+                aria-pressed={category === c}
                 onClick={() => setCategory(c)}
                 type="button"
               >

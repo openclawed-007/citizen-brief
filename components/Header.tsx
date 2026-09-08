@@ -30,7 +30,7 @@ export function Header() {
       </a>
       <header className="header">
         <div className="header-inner shell">
-          <Link href="/" className="brand" onClick={() => setOpen(false)}>
+          <Link href="/" className="brand" aria-label="Citizen Brief home" onClick={() => setOpen(false)}>
             <span className="brand-mark" aria-hidden>
               CB
             </span>
@@ -38,7 +38,7 @@ export function Header() {
           </Link>
           <nav className="nav" aria-label="Primary">
             {LINKS.map((l) => (
-              <Link key={l.href} href={l.href} className={isActive(l.href) ? "active" : ""}>
+              <Link key={l.href} href={l.href} aria-current={isActive(l.href) ? "page" : undefined} className={isActive(l.href) ? "active" : ""}>
                 {l.label}
               </Link>
             ))}
@@ -48,6 +48,7 @@ export function Header() {
               href={patchHref({ version: feed.live.version, wikiUrl: feed.live.wikiUrl || "/patches" })}
               className="status-chip"
               title={`Universe ${statusLabel(feed.status.summary)} — open live patch notes`}
+              aria-label={`Alpha ${feed.live.version} patch notes — universe ${statusLabel(feed.status.summary)}`}
               onClick={() => setOpen(false)}
             >
               <span className={`dot ${tone}`} aria-hidden />
@@ -59,6 +60,7 @@ export function Header() {
               className="menu-btn"
               aria-label={open ? "Close navigation" : "Open navigation"}
               aria-expanded={open}
+              aria-controls={open ? "mobile-navigation" : undefined}
               onClick={() => setOpen((v) => !v)}
             >
               {open ? "Close" : "Menu"}
@@ -66,11 +68,17 @@ export function Header() {
           </div>
         </div>
         {open ? (
-          <nav className="drawer" aria-label="Primary, mobile">
+          <nav id="mobile-navigation" className="drawer" aria-label="Primary, mobile" onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              setOpen(false);
+              document.querySelector<HTMLButtonElement>(".menu-btn")?.focus();
+            }
+          }}>
             {LINKS.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
+                aria-current={isActive(l.href) ? "page" : undefined}
                 className={isActive(l.href) ? "active" : ""}
                 onClick={() => setOpen(false)}
               >

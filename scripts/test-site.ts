@@ -1,7 +1,7 @@
 import { readFile, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { getPatchArticle } from "../lib/feed";
-import { htmlLooksBroken, inlineFormat, wikiToHtml } from "../lib/wiki";
+import { extractPatchMeta, htmlLooksBroken, inlineFormat, wikiToHtml } from "../lib/wiki";
 import { normalizeBrief, notesToText, REQUEST_TIMEOUT_MS, shouldBrief } from "../lib/brief";
 import { rankSearch, type SearchCandidate } from "../lib/search";
 
@@ -25,6 +25,12 @@ async function walkHtml(dir: string): Promise<string[]> {
 }
 
 async function main() {
+  const meta = extractPatchMeta("{{PatchData\n|version=4.10.0\n}}\n[[File:Orison.jpg|thumb]]\n'''Star Citizen Alpha 4.10.0''' brings [[Instancing]].");
+  assert(
+    meta.summary === "Star Citizen Alpha 4.10.0 brings Instancing.",
+    "Patch summary skips wiki image markup",
+    `Patch summary contains image markup instead of prose: ${meta.summary}`,
+  );
   const sample =
     `==== Siege of Orison V2 ====\n` +
     `[[Siege of Orison]] returns as our first [[Instancing]] on Demand mission. ` +
@@ -74,9 +80,9 @@ async function main() {
     "Smart search did not rank the matching ship",
   );
   assert(
-    rankSearch(searchFixtures, "zzzzzz").length > 0,
-    "Smart search always offers useful fallbacks",
-    "Smart search rendered an empty suggestion list",
+    rankSearch(searchFixtures, "zzzzzz").length === 0,
+    "Unmatched searches return no unrelated results",
+    "Smart search presented unrelated items as matches",
   );
 
   const parsed = normalizeBrief({
@@ -144,6 +150,9 @@ async function main() {
   if (pages.length) {
     assert(pages.length >= 8, `Exported ${pages.length} HTML pages`, "Too few exported pages");
     const home = await readFile(join(outDir, "index.html"), "utf8");
+    const basePath = home.match(/(?:src|href)="([^"]*)\/_next\//)?.[1] || "";
+    const exportedPaths = new Set(pages.map((page) => page.slice(outDir.length + 1)));
+    const brokenLinks = new Set<string>();
     assert(home.includes("feature-entry") || home.includes("feature-hero"), "Home includes designed feature stills", "Home is missing feature image layout");
     assert(home.includes("search-launch") || home.includes("Search"), "Search control is present", "Search control missing from home");
     assert(home.includes("Switch to dark mode") || home.includes("Dark") || home.includes("theme"), "Dark mode toggle is present", "Dark mode toggle missing");
@@ -175,6 +184,14 @@ async function main() {
     for (const page of pages) {
       const html = await readFile(page, "utf8");
       const rel = page.replace(process.cwd() + "/", "");
+      for (const match of html.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)) {
+        const href = match[1].split(/[?#]/)[0];
+        if (!href.startsWith("/") || href.startsWith("//")) continue;
+        if (basePath && href !== basePath && !href.startsWith(`${basePath}/`)) continue;
+        const path = decodeURIComponent(href.slice(basePath.length)).replace(/^\/+|\/+$/g, "");
+        const target = path.endsWith(".html") ? path : path ? `${path}/index.html` : "index.html";
+        if (!exportedPaths.has(target)) brokenLinks.add(`${rel}: ${href}`);
+      }
       const visible = html
         .replace(/<script[\s\S]*?<\/script>/gi, " ")
         .replace(/<style[\s\S]*?<\/style>/gi, " ")
@@ -187,6 +204,11 @@ async function main() {
       }
       if (!html.includes("<h1") && !rel.includes("404")) issues.push(`No h1 in ${rel}`);
     }
+    assert(
+      brokenLinks.size === 0,
+      "Every internal page link resolves, including adjacent patch navigation",
+      `Broken internal links: ${[...brokenLinks].join(", ")}`,
+    );
 
     const notesPath = pages.find((p) => p.includes("patches/4.10.0"));
     if (notesPath) {

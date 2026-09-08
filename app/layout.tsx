@@ -4,11 +4,10 @@ import { Bricolage_Grotesque, IBM_Plex_Mono } from "next/font/google";
 import { FeedProvider } from "@/components/FeedProvider";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { ThemeProvider } from "@/components/Theme";
 import { emptyFeed, getFeed, toPublicFeed } from "@/lib/feed";
 import "./globals.css";
 
-const themeBoot = `(function(){try{var t=localStorage.getItem('cb-theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',t)}catch(e){}})();`;
+const themeBoot = `(function(){var t;try{t=localStorage.getItem('cb-theme')}catch(e){}if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',t)})();`;
 
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -57,13 +56,11 @@ export default async function RootLayout({
         <Script id="theme-boot" strategy="beforeInteractive">
           {themeBoot}
         </Script>
-        <ThemeProvider>
-          <FeedProvider initial={feed}>
-            <Header />
-            {children}
-            <Footer />
-          </FeedProvider>
-        </ThemeProvider>
+        <FeedProvider initial={feed}>
+          <Header />
+          {children}
+          <Footer />
+        </FeedProvider>
       </body>
     </html>
   );

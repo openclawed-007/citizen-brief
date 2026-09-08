@@ -56,6 +56,7 @@ export function NewsList() {
                 key={f.id}
                 className={filter === f.id ? "chip on" : "chip"}
                 type="button"
+                aria-pressed={filter === f.id}
                 onClick={() => setFilter(f.id)}
               >
                 {f.label}
@@ -72,7 +73,7 @@ export function NewsList() {
               </div>
             </Link>
           ) : (
-            <p className="empty-note">No matching stories. Try a different filter.</p>
+            <p className="empty-note" role="status">No matching stories. <button className="link-btn" type="button" onClick={() => { setQ(""); setFilter("all"); }}>Clear filters</button></p>
           )}
           <div className="index">
             {items.slice(1).map((item) => (

@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { formatDateTime, statusLabel, statusTone } from "@/lib/format";
-import { useFeed, useSyncedLabel } from "./FeedProvider";
+import { useFeed } from "./FeedProvider";
 
 export function Footer() {
-  const { feed, refresh, refreshing } = useFeed();
-  const label = useSyncedLabel();
+  const { feed, refresh, refreshing, checkedAt, refreshError } = useFeed();
+  const label = refreshing ? "Checking for updates…" : checkedAt ? `Checked ${formatDateTime(checkedAt)}` : "Latest snapshot";
 
   return (
     <footer className="footer">
@@ -18,7 +18,7 @@ export function Footer() {
               Unofficial live briefing for Star Citizen. Patches, the public roadmap, and
               RSI transmissions are harvested automatically.
             </p>
-            <p className="sync">
+            <p className="sync" role="status">
               {label} · Last harvest {formatDateTime(feed.fetchedAt)} ·{" "}
               <button
                 type="button"
@@ -29,6 +29,7 @@ export function Footer() {
                 Refresh now
               </button>
             </p>
+            {refreshError ? <p className="sync" role="status">{refreshError}</p> : null}
           </div>
           <nav aria-label="Browse">
             <strong>Browse</strong>

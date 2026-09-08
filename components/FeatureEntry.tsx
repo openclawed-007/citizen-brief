@@ -18,7 +18,7 @@ function Copy({ card, index }: { card: RoadmapCard; index: number }) {
 }
 
 function Still({ card }: { card: RoadmapCard }) {
-  return card.image ? <img src={card.image} alt="" /> : <div className="ph" aria-hidden />;
+  return card.image ? <img src={card.image} alt="" loading="lazy" decoding="async" /> : <div className="ph" aria-hidden />;
 }
 
 export function FeatureEntry({

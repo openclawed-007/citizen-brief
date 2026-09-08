@@ -106,6 +106,8 @@ export function extractPatchMeta(wikitext: string): {
 
   const firstPara = wikitext
     .replace(/\{\{PatchData[\s\S]*?\n\}\}/, "")
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/^\s*\[\[(?:File|Image|Category):.*$/gim, "")
     .replace(/<ref[\s\S]*?<\/ref>/gi, "")
     .split("\n")
     .map((l) => l.trim())

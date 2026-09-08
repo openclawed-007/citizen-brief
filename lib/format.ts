@@ -39,24 +39,6 @@ export function formatDateTime(input: string | number | null | undefined): strin
   return `${formatDate(date.toISOString())} · ${hh}:${mm} UTC`;
 }
 
-export function relativeTime(input: string | number | null | undefined): string {
-  if (input == null || input === "") return "";
-  const date =
-    typeof input === "number"
-      ? new Date(input > 10_000_000_000 ? input : input * 1000)
-      : new Date(input);
-  if (Number.isNaN(date.getTime())) return "";
-  const diff = Date.now() - date.getTime();
-  const min = Math.round(diff / 60000);
-  if (min < 1) return "just now";
-  if (min < 60) return `${min}m ago`;
-  const hr = Math.round(min / 60);
-  if (hr < 24) return `${hr}h ago`;
-  const day = Math.round(hr / 24);
-  if (day < 14) return `${day}d ago`;
-  return formatDate(date.toISOString());
-}
-
 export function formatMoney(cents: number | null): string {
   if (cents == null) return "—";
   const usd = cents / 100;

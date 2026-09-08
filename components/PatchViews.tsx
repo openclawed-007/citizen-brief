@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { PatchArticle } from "@/lib/types";
-import { formatDate, relativeTime } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { FeatureEntry } from "./FeatureEntry";
 import { useFeed } from "./FeedProvider";
 import { PatchBriefing } from "./PatchBriefing";
@@ -30,7 +30,7 @@ export function PatchList() {
                 {p.isLive ? <span className="live-flag">LIVE</span> : null} {p.version}
               </span>
               <span className="name">{p.title}</span>
-              <span className="meta">{p.releasedAt ? relativeTime(p.releasedAt) : ""}</span>
+              <time className="meta" dateTime={p.releasedAt || undefined}>{p.releasedAt ? formatDate(p.releasedAt) : ""}</time>
             </Link>
           ))}
         </div>
@@ -40,20 +40,22 @@ export function PatchList() {
 }
 
 function prepareArticle(source: string) {
-  const headings = [...source.matchAll(/<h2>([\s\S]*?)<\/h2>/gi)];
-  const toc = headings.map((match, index) => ({
-    id: `sec-${index}`,
-    title: String(match[1]).replace(/<[^>]+>/g, "").trim(),
-  }));
-  const html = headings.reduce(
-    (result, match, index) => result.replace(match[0], `<h2 id="sec-${index}">${match[1]}</h2>`),
-    source,
-  );
+  const toc: { id: string; title: string }[] = [];
+  const html = source.replace(/<h2>([\s\S]*?)<\/h2>/gi, (_, heading: string) => {
+    const id = `sec-${toc.length}`;
+    toc.push({ id, title: heading.replace(/<[^>]+>/g, "").trim() });
+    return `<h2 id="${id}">${heading}</h2>`;
+  });
   return { html, toc };
 }
 
 export function PatchArticleView({ article }: { article: PatchArticle }) {
+  const { patchHref } = useFeed();
   const { html, toc } = prepareArticle(article.html);
+  const adjacentHref = (version: string) => patchHref({
+    version,
+    wikiUrl: `https://starcitizen.tools/Star_Citizen_Alpha_${encodeURIComponent(version)}`,
+  });
 
   return (
     <main id="content">
@@ -120,12 +122,12 @@ export function PatchArticleView({ article }: { article: PatchArticle }) {
         <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />
         <div className="actions actions-spaced">
           {article.prev ? (
-            <Link className="btn" href={`/patches/${article.prev.replace(/^Star Citizen Alpha\s+/i, "")}`}>
+            <Link className="btn" href={adjacentHref(article.prev)}>
               ← {article.prev}
             </Link>
           ) : null}
           {article.next ? (
-            <Link className="btn" href={`/patches/${article.next.replace(/^Star Citizen Alpha\s+/i, "")}`}>
+            <Link className="btn" href={adjacentHref(article.next)}>
               {article.next} →
             </Link>
           ) : null}

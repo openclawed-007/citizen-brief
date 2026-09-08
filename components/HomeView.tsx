@@ -8,7 +8,6 @@ import {
   formatMoney,
   formatNumber,
   kindLabel,
-  relativeTime,
   statusLabel,
   statusTone,
 } from "@/lib/format";
@@ -177,7 +176,7 @@ export function HomeView() {
           <div className="index">
             {news.slice(1, 8).map((item) => (
               <Link key={item.id} href={newsHref(item)}>
-                <time>{item.publishedAt ? relativeTime(item.publishedAt) : ""}</time>
+                <time dateTime={item.publishedAt || undefined}>{item.publishedAt ? formatDate(item.publishedAt) : ""}</time>
                 <span className="kind">{kindLabel(item.kind)}</span>
                 <span className="name">{item.title}</span>
               </Link>

@@ -51,7 +51,7 @@ function tokenScore(token: string, words: string[]): number {
 
   const allowedDistance = token.length >= 5 ? 2 : 1;
   const distance = words.reduce(
-    (best, word) => Math.min(best, editDistance(token, word)),
+    (best, word) => Math.abs(token.length - word.length) > allowedDistance ? best : Math.min(best, editDistance(token, word)),
     Number.POSITIVE_INFINITY,
   );
   return distance <= allowedDistance ? 13 - distance * 3 : 0;
@@ -103,11 +103,7 @@ export function rankSearch<T extends SearchCandidate>(
     score: scoreCandidate(candidate, query),
   }));
   const matches = scored.filter((entry) => entry.score > 0);
-  const pool = matches.length
-    ? matches
-    : scored.map((entry) => ({ ...entry, score: entry.candidate.priority }));
-
-  return pool
+  return matches
     .sort((a, b) => b.score - a.score || a.index - b.index)
     .slice(0, limit)
     .map((entry) => entry.candidate);
