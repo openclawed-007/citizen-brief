@@ -118,7 +118,7 @@ async function main() {
   assert(notesToText("<script>alert(1)</script><h2>Ships</h2><p>Idris added</p>").includes("Ships"), "Brief text extract keeps headings", "Brief text extract dropped headings");
   assert(!notesToText("<script>alert(1)</script><p>Idris</p>").includes("alert"), "Brief text extract drops scripts", "Brief text extract kept script text");
   assert(shouldBrief(0, false) && shouldBrief(99, true) && !shouldBrief(99, false), "Only live and recent patches are briefed", "Brief selection is too wide");
-  assert(REQUEST_TIMEOUT_MS <= 10_000, "Brief requests time out quickly", `Brief timeout is too long: ${REQUEST_TIMEOUT_MS}`);
+  assert(REQUEST_TIMEOUT_MS <= 30_000, "Brief requests have a bounded timeout", `Brief timeout is too long: ${REQUEST_TIMEOUT_MS}`);
   const briefingUi = await readFile(join(process.cwd(), "components", "PatchBriefing.tsx"), "utf8");
   assert(
     briefingUi.includes("Briefing isn&apos;t available yet") && briefingUi.includes("brief: PatchBrief | null"),

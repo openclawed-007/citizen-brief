@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { formatDateTime, statusLabel, statusTone } from "@/lib/format";
 import { useFeed } from "./FeedProvider";
+import { aiStatusLabel } from "@/lib/ai-status";
 
 export function Footer() {
   const { feed, refresh, refreshing, checkedAt, refreshError } = useFeed();
@@ -30,6 +31,15 @@ export function Footer() {
               </button>
             </p>
             {refreshError ? <p className="sync" role="status">{refreshError}</p> : null}
+            <details className="sync">
+              <summary>{aiStatusLabel(feed.ai)}</summary>
+              <p>
+                {feed.ai ? <>Last processing run {formatDateTime(feed.ai.checkedAt)}. {feed.ai.generated} generated, {feed.ai.cached} saved, {feed.ai.failed} unavailable.</> : "Processing status will appear after the next harvest."}
+                {feed.ai && !feed.ai.primaryConfigured ? " Gemini is awaiting configuration." : " Primary: Gemini 3.8 Flash."}
+                {" "}Fallback: OpenRouter free models. This is a harvest result, not a live connection check.
+                {feed.ai?.models.length ? ` Models used: ${feed.ai.models.join(", ")}.` : ""}
+              </p>
+            </details>
           </div>
           <nav aria-label="Browse">
             <strong>Browse</strong>

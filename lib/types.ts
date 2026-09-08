@@ -136,7 +136,18 @@ export type PatchArticle = PatchSummary & {
   wantsBrief: boolean;
 };
 
+export type AiStatus = {
+  checkedAt: string;
+  primaryConfigured: boolean;
+  generated: number;
+  fallback: number;
+  failed: number;
+  cached: number;
+  models: string[];
+};
+
 export type Feed = {
+  ai?: AiStatus;
   fetchedAt: string;
   fingerprint: string;
   notice: string | null;

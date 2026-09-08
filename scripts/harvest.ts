@@ -1,5 +1,5 @@
 import { mkdir, writeFile } from "node:fs/promises";
-import { saveBriefCache, shouldBrief } from "../lib/brief";
+import { briefProcessingStatus, saveBriefCache, shouldBrief } from "../lib/brief";
 import { getFeed, getPatchArticle, toPublicFeed } from "../lib/feed";
 
 async function main() {
@@ -7,7 +7,6 @@ async function main() {
   const fullFeed = await getFeed(true);
   const feed = toPublicFeed(fullFeed);
   await mkdir("public", { recursive: true });
-  await writeFile("public/feed.json", JSON.stringify(feed));
   await writeFile("public/.nojekyll", "");
 
   let briefed = 0;
@@ -18,6 +17,9 @@ async function main() {
     if (article.brief) briefed += 1;
   }
   await saveBriefCache();
+  feed.ai = briefProcessingStatus();
+  await writeFile("public/feed.json", JSON.stringify(feed));
+  console.log("AI processing:", JSON.stringify(feed.ai));
 
   console.log(
     `Harvested live ${feed.live.version} · ${feed.news.length} posts · ${feed.patches.length} patches · ${briefed} briefs`,

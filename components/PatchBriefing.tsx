@@ -27,10 +27,10 @@ export function PatchBriefing({ brief }: { brief: PatchBrief | null }) {
               <p className="eyebrow">Desk briefing</p>
               <h2 id="patch-brief-title">Briefing isn&apos;t available yet</h2>
               <p className="brief-headline">
-                The summary did not come back in time. Official notes below are still current.
+                AI processing could not produce a summary. You can still read the source notes below.
               </p>
             </div>
-            <p className="brief-note">This page will fill in on a later harvest if the model responds in time.</p>
+            <p className="brief-note">Processing will retry on a later harvest. Check the AI status at the bottom of the page.</p>
           </article>
         </div>
       </section>
@@ -85,7 +85,7 @@ export function PatchBriefing({ brief }: { brief: PatchBrief | null }) {
               </div>
             </details>
           ) : null}
-          <p className="brief-note">Generated from the official notes. The full source is below.</p>
+          <p className="brief-note">AI summary available · Generated from the official notes. Check the full source below for accuracy.</p>
         </article>
       </div>
     </section>

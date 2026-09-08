@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { readFile } from "node:fs/promises";
 import Script from "next/script";
 import { Bricolage_Grotesque, IBM_Plex_Mono } from "next/font/google";
 import { FeedProvider } from "@/components/FeedProvider";
@@ -49,6 +50,10 @@ export default async function RootLayout({
   } catch {
     feed = emptyFeed();
   }
+  try {
+    const snapshot = JSON.parse(await readFile("public/feed.json", "utf8"));
+    feed.ai = snapshot.ai;
+  } catch { /* A local dev server may not have a harvested snapshot yet. */ }
 
   return (
     <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>

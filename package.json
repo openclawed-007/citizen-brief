@@ -9,7 +9,7 @@
     "build": "next build",
     "start": "next start --port ${PORT:-3000}",
     "lint": "eslint .",
-    "test": "npx tsx scripts/test-site.ts"
+    "test": "tsx --test scripts/test-ai.ts && tsx scripts/test-site.ts"
   },
   "dependencies": {
     "next": "^16.3.3",

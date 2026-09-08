@@ -32,7 +32,13 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Patch pages can include a desk briefing (headline, takeaways, then a closed "full organised notes" section). That is generated at harvest/build time from the official notes via OpenRouter (`deepseek/deepseek-v4-flash-0731`). If the model does not respond within 10 seconds, the page still ships and says the briefing is not available, and any last good briefing is kept. Visitors never call the model, so it cannot be used as a public chatbot. Set `OPENROUTER_API_KEY` in `.env.local` for local harvest, and as the GitHub Actions secret of the same name for deploys. Generated briefs live in `data/briefs.json` and are committed so deploys do not need a live model call.
+Patch briefings are generated during harvest from the source notes using Google's Gemini API (`gemini-3.8-flash`). Use a Google AI Studio key from a free-tier project as `GEMINI_API_KEY` in `.env.local` and the GitHub Actions repository secrets. The API uses the key's project billing tier; code cannot turn a paid project into a free one.
+
+Set `OPENROUTER_API_KEY` for fallback through `openrouter/free`, which selects currently available free models supporting JSON output. Each provider has one 30-second attempt. Errors, quota limits, invalid JSON and truncated output trigger fallback; if both fail, the last good summary is preserved. Visitors never call either provider and keys stay out of the browser.
+
+Briefs are cached by source hash and model policy in `data/briefs.json`, with GitHub Actions preserving that cache between deployments. A model change regenerates old briefs, and adding the Gemini key upgrades fallback briefs on the next harvest. Static page workers read the harvested briefs without making extra AI calls.
+
+The footer's AI indicator reports the latest harvest: Gemini working, free fallback, partial/unavailable processing, or saved summaries. Expand it for the timestamp and counts. Cached summaries do not imply the provider was tested; this is not a live uptime monitor. It refreshes with the existing feed snapshot polling.
 
 Static production build:
 
