@@ -133,6 +133,7 @@ export type PatchArticle = PatchSummary & {
   cards: RoadmapCard[];
   source: "wiki" | "comm-link" | "roadmap";
   brief: PatchBrief | null;
+  briefModel: string | null;
   wantsBrief: boolean;
 };
 

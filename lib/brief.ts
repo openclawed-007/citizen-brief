@@ -224,9 +224,10 @@ export async function briefForPatch(version: string, title: string, html: string
   // Static page workers only read the harvest result; they never spend quota again.
   if (process.env.NODE_ENV === "production" && process.env.HARVEST !== "1") return hit?.brief || null;
   if (hit && hit.hash === hash && hit.primaryModel === BRIEF_MODEL &&
-      !(hit.brief && hit.model !== BRIEF_MODEL && process.env.GEMINI_API_KEY?.trim())) {
+      !(hit.brief && hit.model !== BRIEF_MODEL && hit.model !== "assistant-written" && process.env.GEMINI_API_KEY?.trim())) {
     if (hit.brief) {
       processing.cached += 1;
+      usedModels.add(hit.model);
       return hit.brief;
     }
     const age = Date.now() - Date.parse(hit.at);
@@ -241,6 +242,7 @@ export async function briefForPatch(version: string, title: string, html: string
     processing.failed += 1;
     if (hit?.brief) {
       processing.cached += 1;
+      usedModels.add(hit.model);
       return hit.brief;
     }
     store[version] = { hash, brief: null, model: BRIEF_MODEL, primaryModel: BRIEF_MODEL, at: new Date().toISOString() };

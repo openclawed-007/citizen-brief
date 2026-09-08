@@ -29,8 +29,8 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: data/briefs.json
-          key: briefs-gemini38-v2-${{ github.run_id }}-${{ github.run_attempt }}
-          restore-keys: briefs-gemini38-v2-
+          key: briefs-gemini38-seeded-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: briefs-gemini38-seeded-
       - name: Harvest official sources and export
         env:
           STATIC_EXPORT: "1"

@@ -686,7 +686,7 @@ article.feature-entry { cursor: default; }
   width: 100%;
 }
 
-.prose { color: var(--ink-2); font-size: 17px; line-height: 1.75; }
+.prose { color: var(--ink-2); font-size: 17px; line-height: 1.75; overflow-wrap: anywhere; }
 .prose h2, .prose h3, .prose h4 { color: var(--ink); margin: 1.7em 0 0.5em; }
 .prose h2 { font-size: 25px; }
 .prose h3 { font-size: 19px; }

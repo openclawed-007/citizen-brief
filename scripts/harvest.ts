@@ -1,5 +1,5 @@
 import { mkdir, writeFile } from "node:fs/promises";
-import { briefProcessingStatus, saveBriefCache, shouldBrief } from "../lib/brief";
+import { briefProcessingStatus, loadBriefCache, saveBriefCache, shouldBrief } from "../lib/brief";
 import { getFeed, getPatchArticle, toPublicFeed } from "../lib/feed";
 
 async function main() {
@@ -10,9 +10,10 @@ async function main() {
   await writeFile("public/.nojekyll", "");
 
   let briefed = 0;
+  const cache = await loadBriefCache();
   for (let index = 0; index < fullFeed.patches.length; index += 1) {
     const patch = fullFeed.patches[index];
-    if (!shouldBrief(index, patch.isLive)) continue;
+    if (!shouldBrief(index, patch.isLive) && !cache[patch.version]?.brief) continue;
     const article = await getPatchArticle(patch.version);
     if (article.brief) briefed += 1;
   }

@@ -1,4 +1,5 @@
 import type { BriefItem, PatchBrief } from "@/lib/types";
+import { briefAuthor } from "@/lib/ai-status";
 
 function BriefList({ title, items }: { title: string; items: BriefItem[] }) {
   if (items.length === 0) return null;
@@ -17,7 +18,7 @@ function BriefList({ title, items }: { title: string; items: BriefItem[] }) {
   );
 }
 
-export function PatchBriefing({ brief }: { brief: PatchBrief | null }) {
+export function PatchBriefing({ brief, model }: { brief: PatchBrief | null; model: string | null }) {
   if (!brief) {
     return (
       <section className="section brief-section" aria-labelledby="patch-brief-title">
@@ -85,7 +86,7 @@ export function PatchBriefing({ brief }: { brief: PatchBrief | null }) {
               </div>
             </details>
           ) : null}
-          <p className="brief-note">AI summary available · Generated from the official notes. Check the full source below for accuracy.</p>
+          <p className="brief-note">{model ? briefAuthor(model) : "AI summary"} · Based on the source notes. Check the full source below for accuracy.</p>
         </article>
       </div>
     </section>

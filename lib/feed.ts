@@ -8,7 +8,7 @@ import type {
   SourceHealth,
 } from "./types";
 import { formatDate, versionFromCode } from "./format";
-import { briefForPatch, shouldBrief } from "./brief";
+import { briefForPatch, loadBriefCache, shouldBrief } from "./brief";
 import { extractPatchMeta, plainToHtml, wikiToHtml } from "./wiki";
 import {
   fetchCommLink,
@@ -310,14 +310,16 @@ export async function getPatchArticle(version: string): Promise<PatchArticle> {
     cards: release?.cards || [],
     source,
     brief: null,
+    briefModel: null,
     wantsBrief: false,
   };
 
   const index = feed.patches.findIndex((p) => p.version === key);
-  article.wantsBrief = shouldBrief(index < 0 ? 99 : index, article.isLive);
+  article.wantsBrief = shouldBrief(index < 0 ? 99 : index, article.isLive) || Boolean((await loadBriefCache())[key]?.brief);
   if (article.wantsBrief) {
     article.brief = await briefForPatch(key, article.title, article.html);
   }
+  if (article.brief) article.briefModel = (await loadBriefCache())[key]?.model || null;
 
   patchBox.set(key, { value: article, at: Date.now(), inflight: null });
   return article;

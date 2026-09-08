@@ -38,6 +38,8 @@ Set `OPENROUTER_API_KEY` for fallback through `google/gemma-4-31b-it:free`, then
 
 Briefs are cached by source hash and model policy in `data/briefs.json`, with GitHub Actions preserving that cache between deployments. A model change regenerates old briefs, and adding the Gemini key upgrades fallback briefs on the next harvest. Static page workers read the harvested briefs without making extra AI calls.
 
+The initial set contains five Gemini briefings and four assistant-written summaries completed from the source notes. Each page displays its summary's origin. Assistant-written summaries are preserved while their source hash is unchanged. Older patch pages display existing cached summaries without extending automatic generation to every historical release.
+
 The footer's AI indicator reports the latest harvest: Gemini working, free fallback, partial/unavailable processing, or saved summaries. Expand it for the timestamp and counts. Cached summaries do not imply the provider was tested; this is not a live uptime monitor. It refreshes with the existing feed snapshot polling.
 
 Static production build:

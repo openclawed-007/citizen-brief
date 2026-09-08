@@ -4,7 +4,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { BRIEF_MODEL, FALLBACK_MODEL, briefForPatch, notesHash, requestBrief } from "../lib/brief";
-import { aiStatusLabel } from "../lib/ai-status";
+import { aiStatusLabel, briefAuthor } from "../lib/ai-status";
 
 test("AI provider routing and honest status labels", async () => {
   const originalFetch = globalThis.fetch;
@@ -68,6 +68,8 @@ test("AI provider routing and honest status labels", async () => {
     assert.match(aiStatusLabel({ ...status, cached: 3 }), /Saved summaries/);
     assert.match(aiStatusLabel({ ...status, cached: 3, failed: 1 }), /unavailable/);
     assert.match(aiStatusLabel({ ...status, generated: 1, failed: 1 }), /Partially/);
+    assert.equal(briefAuthor("assistant-written"), "Assistant-written");
+    assert.equal(briefAuthor(BRIEF_MODEL), "Gemini 3.8 Flash");
   } finally {
     globalThis.fetch = originalFetch;
     if (originalGemini === undefined) delete process.env.GEMINI_API_KEY;
@@ -87,7 +89,10 @@ test("Model migration, cached reads and last-good-summary preservation", async (
   try {
     process.chdir(directory);
     await mkdir("data");
-    await writeFile("data/briefs.json", JSON.stringify({ test: { hash: notesHash(html), brief: old, model: "old-model", at: "2026-01-01T00:00:00Z" } }));
+    await writeFile("data/briefs.json", JSON.stringify({
+      test: { hash: notesHash(html), brief: old, model: "old-model", at: "2026-01-01T00:00:00Z" },
+      manual: { hash: notesHash(html), brief: old, model: "assistant-written", primaryModel: BRIEF_MODEL, at: "2026-01-01T00:00:00Z" },
+    }));
     process.env.GEMINI_API_KEY = "";
     process.env.OPENROUTER_API_KEY = "";
     process.env.HARVEST = "1";
@@ -101,6 +106,8 @@ test("Model migration, cached reads and last-good-summary preservation", async (
     assert.equal((await briefForPatch("test", "Title", html))?.headline, "Gemini summary");
     assert.equal((await briefForPatch("test", "Title", html))?.headline, "Gemini summary");
     assert.equal(requests, 1, "Unchanged notes are generated only once");
+    assert.deepEqual(await briefForPatch("manual", "Title", html), old);
+    assert.equal(requests, 1, "Assistant-written summaries remain cached even with a Gemini key configured");
     const stored = JSON.parse(await readFile("data/briefs.json", "utf8"));
     assert.equal(stored.test.model, BRIEF_MODEL);
     Object.assign(process.env, { NODE_ENV: "production" });
