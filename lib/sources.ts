@@ -151,21 +151,31 @@ export function classifyNews(item: {
   return "official";
 }
 
-function pickCover(
-  images: RawCommLink["images"],
-): string | null {
-  if (!images?.length) return null;
-  const ranked = [...images].sort((a, b) => (b.size || 0) - (a.size || 0));
-  const good = ranked.find((img) => {
-    const name = (img.name || "").toLowerCase();
-    if (/divid|line|icon|logo-small|spacer|pixel/.test(name)) return false;
-    return (img.size || 0) > 40_000;
+function editorialImages(images: RawCommLink["images"]) {
+  const seen = new Set<string>();
+  return (images || []).filter((image) => {
+    const url = rsiMedia(image.rsi_url);
+    if (!url || seen.has(url)) return false;
+    const path = new URL(url).pathname;
+    if (image.mime_type && !image.mime_type.toLowerCase().startsWith("image/")) return false;
+    if (/\.(mp4|webm|mov|m4v|pdf)$/i.test(path)) return false;
+    if (!image.mime_type && !/\.(jpe?g|png|webp|avif|gif|svg)$/i.test(path)) return false;
+    if (image.size != null && image.size < 40_000) return false;
+    if (/(?:^|[-_\s])(divider|dividing|spacer|pixel|icon|logo)(?:[-_.\s]|$)|^starcitizen_(?:white|black)/i.test(image.name || "")) return false;
+    seen.add(url);
+    return true;
+  }).sort((a, b) => {
+    // Prefer an editorial banner, then a reasonably sized still, rather than
+    // the largest download (which used to select videos and 8K originals).
+    const priority = (image: NonNullable<RawCommLink["images"]>[number]) =>
+      /banner|header|thumbnail/i.test(image.name || "") ? 0 : 1;
+    return priority(a) - priority(b) || (a.size || Infinity) - (b.size || Infinity);
   });
-  return rsiMedia((good || ranked[0])?.rsi_url);
 }
 
 export function mapCommLink(raw: RawCommLink): NewsItem {
   const body = raw.translations?.en_EN || "";
+  const images = editorialImages(raw.images);
   return {
     id: raw.id,
     title: raw.title,
@@ -177,8 +187,8 @@ export function mapCommLink(raw: RawCommLink): NewsItem {
     url: raw.rsi_url,
     apiUrl: raw.api_url,
     excerpt: excerpt(body.replace(/^[A-Z][A-Z0-9 .,:;-]{7,80}\n/, ""), 240),
-    image: pickCover(raw.images),
-    imageCount: raw.images_count || raw.images?.length || 0,
+    image: rsiMedia(images[0]?.rsi_url),
+    imageCount: images.length,
   };
 }
 
@@ -187,10 +197,10 @@ export function mapCommLinkArticle(raw: RawCommLink): NewsItem & { body: string;
   return {
     ...item,
     body: raw.translations?.en_EN || "",
-    images: (raw.images || [])
+    images: editorialImages(raw.images)
       .map((img) => ({
         url: rsiMedia(img.rsi_url) || "",
-        alt: img.alt || raw.title,
+        alt: img.alt && !/^g-|^(image|banner|illustration)$/i.test(img.alt) ? img.alt : raw.title,
         name: img.name || "",
       }))
       .filter((img) => img.url),

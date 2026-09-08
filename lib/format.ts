@@ -61,11 +61,15 @@ export function formatNumber(n: number | null): string {
 }
 
 export function rsiMedia(url: string | null | undefined): string | null {
-  if (!url) return null;
-  if (url.startsWith("http")) return url;
-  if (url.startsWith("//")) return `https:${url}`;
-  if (url.startsWith("/")) return `https://robertsspaceindustries.com${url}`;
-  return `https://robertsspaceindustries.com/${url}`;
+  if (!url?.trim()) return null;
+  try {
+    const resolved = new URL(url.trim(), "https://robertsspaceindustries.com/");
+    if (resolved.protocol !== "http:" && resolved.protocol !== "https:") return null;
+    resolved.protocol = "https:";
+    return resolved.href;
+  } catch {
+    return null;
+  }
 }
 
 export function excerpt(text: string, max = 220): string {

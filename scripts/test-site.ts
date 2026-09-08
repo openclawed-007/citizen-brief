@@ -4,6 +4,8 @@ import { getPatchArticle } from "../lib/feed";
 import { extractPatchMeta, htmlLooksBroken, inlineFormat, wikiToHtml } from "../lib/wiki";
 import { normalizeBrief, notesToText, REQUEST_TIMEOUT_MS, shouldBrief } from "../lib/brief";
 import { rankSearch, type SearchCandidate } from "../lib/search";
+import { mapCommLink, mapCommLinkArticle } from "../lib/sources";
+import { rsiMedia } from "../lib/format";
 
 const issues: string[] = [];
 const ok: string[] = [];
@@ -25,6 +27,23 @@ async function walkHtml(dir: string): Promise<string[]> {
 }
 
 async function main() {
+  const media = {
+    id: 1, title: "Test story", rsi_url: "https://robertsspaceindustries.com/story", api_url: "",
+    images: [
+      { name: "source.mp4", rsi_url: "/source.mp4", mime_type: "video/mp4", size: 190_000_000 },
+      { name: "unknown.mp4", rsi_url: "/unknown.mp4", size: 100_000_000 },
+      { name: "logo.png", rsi_url: "/logo.png", mime_type: "image/png", size: 500_000 },
+      { name: "skyline.jpg", rsi_url: "/skyline.jpg", mime_type: "image/jpeg", size: 250_000 },
+      { name: "original.jpg", rsi_url: "/original.jpg", mime_type: "image/jpeg", size: 9_000_000 },
+      { name: "skyline.jpg", rsi_url: "https://robertsspaceindustries.com/skyline.jpg", mime_type: "image/jpeg", size: 250_000 },
+    ],
+  };
+  const story = mapCommLink(media);
+  const mediaArticle = mapCommLinkArticle(media);
+  assert(story.image === "https://robertsspaceindustries.com/skyline.jpg", "News cover selects a lighter still instead of video or 8K media", `Wrong news cover: ${story.image}`);
+  assert(mediaArticle.images.length === 2 && story.imageCount === 2, "Article media excludes videos, decorations and duplicates", "Article includes unsuitable or repeated media");
+  assert(mapCommLink({ ...media, images: media.images.slice(0, 3) }).image === null, "Posts without usable stills have no fake cover", "Non-image media is still selected as a cover");
+  assert(rsiMedia(" http://media.robertsspaceindustries.com/still.jpg ") === "https://media.robertsspaceindustries.com/still.jpg" && rsiMedia("javascript:alert(1)") === null, "Media URLs are normalized to safe HTTPS URLs", "Media normalization accepts an invalid URL or mixed content");
   const meta = extractPatchMeta("{{PatchData\n|version=4.10.0\n}}\n[[File:Orison.jpg|thumb]]\n'''Star Citizen Alpha 4.10.0''' brings [[Instancing]].");
   assert(
     meta.summary === "Star Citizen Alpha 4.10.0 brings Instancing.",
@@ -153,7 +172,7 @@ async function main() {
     const basePath = home.match(/(?:src|href)="([^"]*)\/_next\//)?.[1] || "";
     const exportedPaths = new Set(pages.map((page) => page.slice(outDir.length + 1)));
     const brokenLinks = new Set<string>();
-    assert(home.includes("feature-entry") || home.includes("feature-hero"), "Home includes designed feature stills", "Home is missing feature image layout");
+    assert(home.includes("feature-entry"), "Home includes designed feature stills", "Home is missing feature image layout");
     assert(home.includes("search-launch") || home.includes("Search"), "Search control is present", "Search control missing from home");
     assert(home.includes("Switch to dark mode") || home.includes("Dark") || home.includes("theme"), "Dark mode toggle is present", "Dark mode toggle missing");
 
@@ -184,6 +203,7 @@ async function main() {
     for (const page of pages) {
       const html = await readFile(page, "utf8");
       const rel = page.replace(process.cwd() + "/", "");
+      if (/<img\b[^>]*\bsrc="[^"]+\.(?:mp4|webm|mov)(?:[?\"][^>]*)?/i.test(html)) issues.push(`Video rendered as an image in ${rel}`);
       for (const match of html.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)) {
         const href = match[1].split(/[?#]/)[0];
         if (!href.startsWith("/") || href.startsWith("//")) continue;

@@ -1,6 +1,7 @@
 "use client";
 
 import type { RoadmapCard } from "@/lib/types";
+import { MediaImage } from "./MediaImage";
 
 function Copy({ card, index }: { card: RoadmapCard; index: number }) {
   return (
@@ -17,35 +18,29 @@ function Copy({ card, index }: { card: RoadmapCard; index: number }) {
   );
 }
 
-function Still({ card }: { card: RoadmapCard }) {
-  return card.image ? <img src={card.image} alt="" loading="lazy" decoding="async" /> : <div className="ph" aria-hidden />;
-}
-
 export function FeatureEntry({
   card,
   index,
-  featured = false,
   compact = false,
   onOpen,
 }: {
   card: RoadmapCard;
   index: number;
-  featured?: boolean;
   compact?: boolean;
   onOpen?: (card: RoadmapCard) => void;
 }) {
-  const className = featured ? "feature-hero" : compact ? "feature-entry compact" : "feature-entry";
+  const className = compact ? "feature-entry compact" : "feature-entry";
   if (onOpen) {
     return (
       <button type="button" className={className} onClick={() => onOpen(card)}>
-        <Still card={card} />
+        <MediaImage src={card.image} />
         <Copy card={card} index={index} />
       </button>
     );
   }
   return (
     <article className={className}>
-      <Still card={card} />
+      <MediaImage src={card.image} />
       <Copy card={card} index={index} />
     </article>
   );

@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { RoadmapCard, RoadmapRelease } from "@/lib/types";
 import { useFeed } from "./FeedProvider";
 import { Modal } from "./Modal";
+import { MediaImage } from "./MediaImage";
 import { FeatureEntry } from "./FeatureEntry";
 import { formatDateTime } from "@/lib/format";
 
@@ -24,7 +25,7 @@ export function CardDrawer({
         </p>
         <h3 id="card-title">{card.name}</h3>
         <p className="status">{card.status}</p>
-        {card.image ? <img src={card.image} alt="" /> : null}
+        {card.image ? <MediaImage src={card.image} /> : null}
         <p>{card.description}</p>
         <div className="actions">
           <a className="btn" href={card.url} target="_blank" rel="noreferrer">

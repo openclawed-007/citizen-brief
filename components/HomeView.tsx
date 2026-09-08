@@ -14,6 +14,8 @@ import {
 import { useFeed } from "./FeedProvider";
 import { CardDrawer } from "./RoadmapBoard";
 import { FeatureEntry } from "./FeatureEntry";
+import { MediaImage } from "./MediaImage";
+import { NewsLead } from "./NewsLead";
 
 export function HomeView() {
   const { feed, newsHref, patchHref } = useFeed();
@@ -22,13 +24,6 @@ export function HomeView() {
   const nextRel = roadmap.upcoming[0];
   const lead = news[0];
   const [open, setOpen] = useState<RoadmapCard | null>(null);
-  const needle = live.title.replace(/['"]/g, "").toLowerCase();
-  const leadIndex = Math.max(
-    0,
-    features.findIndex((c) => needle && c.name.toLowerCase().includes(needle.split(" ")[0] || needle)),
-  );
-  const leadFeature = features[leadIndex] || features[0];
-  const rest = features.filter((_, i) => i !== leadIndex);
 
   return (
     <main id="content">
@@ -36,7 +31,7 @@ export function HomeView() {
         <div className="shell">
           <nav className="jump" aria-label="On this page">
             <span>Jump to</span>
-            <a href="#in-patch">What shipped</a>
+            <a href="#in-patch">Release highlights</a>
             {nextRel ? <a href="#next">Coming next</a> : null}
             <a href="#posts">Latest news</a>
           </nav>
@@ -69,8 +64,7 @@ export function HomeView() {
                 </div>
               </div>
               <figure className="hero-media">
-                {live.image ? <img src={live.image} alt={live.title} /> : <div className="ph" />}
-                <figcaption>Official still · Roberts Space Industries</figcaption>
+                <MediaImage src={live.image} alt={live.title} priority />
               </figure>
             </div>
             <dl className="facts">
@@ -111,20 +105,18 @@ export function HomeView() {
             <div>
               <p className="eyebrow">Inside the update</p>
               <h2>What changed in {live.version}</h2>
-              <p>Official deliverables, translated into a quick, scannable briefing.</p>
+              <p>From the current release board. Select an item for details.</p>
             </div>
             <Link className="more" href="/roadmap">
-              Full roadmap
+              All release details →
             </Link>
           </div>
-          {leadFeature ? (
-            <FeatureEntry card={leadFeature} index={0} featured onOpen={setOpen} />
-          ) : null}
           <div className="feature-stack">
-            {rest.map((card, i) => (
-              <FeatureEntry key={card.id} card={card} index={i + 1} onOpen={setOpen} />
+            {features.slice(0, 4).map((card, i) => (
+              <FeatureEntry key={card.id} card={card} index={i} onOpen={setOpen} />
             ))}
           </div>
+          {!features.length ? <p className="empty-note">Release details are temporarily unavailable. You can still read the official patch notes above.</p> : null}
         </div>
       </section>
 
@@ -144,7 +136,7 @@ export function HomeView() {
               </Link>
             </div>
             <div className="feature-stack">
-              {nextRel.cards.slice(0, 10).map((card, i) => (
+              {nextRel.cards.slice(0, 4).map((card, i) => (
                 <FeatureEntry key={card.id} card={card} index={i} onOpen={setOpen} />
               ))}
             </div>
@@ -164,14 +156,7 @@ export function HomeView() {
             </Link>
           </div>
           {lead ? (
-            <Link href={newsHref(lead)} className="lead-story">
-              {lead.image ? <img src={lead.image} alt="" /> : <div className="ph" />}
-              <div>
-                <span className="kind">{kindLabel(lead.kind)}</span>
-                <h3>{lead.title}</h3>
-                <p>{lead.excerpt}</p>
-              </div>
-            </Link>
+            <NewsLead item={lead} href={newsHref(lead)} />
           ) : null}
           <div className="index">
             {news.slice(1, 8).map((item) => (
