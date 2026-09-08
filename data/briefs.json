@@ -71,95 +71,79 @@
   "4.10.0": {
     "hash": "bba2946ff53f50c708075f8d",
     "brief": {
-      "headline": "Star Citizen Alpha 4.10.0 is now live, bringing Siege of Orison as an instanced FPS mission, new gear, fuel and armor rebalances, and a broad wave of fixes.",
+      "headline": "Star Citizen Alpha 4.10.0 releases to LIVE featuring on-demand instancing for the reworked Siege of Orison, Recco Battaglia's return, and broad vehicle armor and fuel rebalances.",
       "takeaways": [
-        "Siege of Orison now runs as an instanced, up-to-4-player FPS mission with new checkpoints, Nine Tails armor, and rewards including a custom weapon skin.",
-        "Fuel tanks and consumption were rebalanced, fuel prices increased, and refueling missions were updated to match.",
-        "Destroyed vehicle armor no longer reduces damage, and vehicle weapon balance saw changes to gatlings and the Combine Cannon.",
-        "New gear added: BUL-H4 Super Heavy Armor, Vendetta HMG, and the HDGW Arlington lever-action rifle.",
-        "Instancing debuts in the Persistent Universe, with Siege of Orison and Recco Battaglia's office as the first instance-based content."
+        "Instancing on Demand debuts with Siege of Orison V2 as an FPS-only, 4-player private instance with checkpoint respawns.",
+        "Recco Battaglia returns to Levski with multi-tier mining, defense, and recovery contracts rewarding hardware and blueprints.",
+        "Ship armor no longer absorbs damage when destroyed, fuel tank capacities and consumption are rebalanced, and fuel prices have substantially increased.",
+        "New gear arrives including the BUL-H4 Super Heavy Armor, Vendetta HMG, and the switchable DMR/shotgun HDGW Arlington Rifle."
       ],
       "newContent": [
         {
-          "title": "Siege of Orison V2: Instancing on Demand mission, up to 4 players, reworked FPS-only platf",
-          "detail": ""
+          "title": "Instancing on Demand & Siege of Orison V2",
+          "detail": "Adds closed private instances for parties up to 4 players, starting with the reworked FPS-only Siege of Orison featuring fresh Nine Tails armor tiers, boss encounters, and unlimited medical bed respawn checkpoints."
         },
         {
-          "title": "Recco Battaglia added as a mission giver at Louge, starting a story line covering independ",
-          "detail": ""
+          "title": "Recco Battaglia Mission Giver",
+          "detail": "Introduces Recco Battaglia in Levski with three initial story missions and unlockable contract tiers for rock cracking, miner defense, missing persons, and item recovery, offering blueprints and mining components as rewards."
         },
         {
-          "title": "Wikelo Emporium now has new exchanges: a snow camo variant of BUL-H4 armor, a matching Ven",
-          "detail": ""
+          "title": "BUL-H4 Armor and Vendetta HMG",
+          "detail": "Adds a super heavy one-piece armor set, a specialized ammo backpack, and the Apocalypse Arms Vendetta heavy machine gun, which allows party members to reload the wearer via tractor beam or hand placement."
         },
         {
-          "title": "Global loot pass: weapon caches carry more than double items, large weapon attachments are",
-          "detail": ""
+          "title": "HDGW Arlington Rifle",
+          "detail": "Introduces a switchable lever-action ballistic rifle capable of firing single DMR rounds at 550 m/s or 8-pellet shotgun blasts at 300 m/s, accompanied by a dedicated HDGW optic."
         },
         {
-          "title": "After 4.10, ore and commodity containers now persist in Long Term Persistence (in-game pur",
-          "detail": ""
+          "title": "Wikelo Exchange Ship & Blueprint Crafting",
+          "detail": "Wikelo now offers ship exchanges requiring crafted items via single-use blueprints, alongside armor and weapon trades that reward reusable crafting blueprints."
         },
         {
-          "title": "New playable item: the BUL-H4 Super Heavy Armor set with helmet and ammo backpack, paired ",
-          "detail": ""
-        },
-        {
-          "title": "New FPS weapon: the HDGW Arlington Rifle with DMR and shotgun fire modes, customatically b",
-          "detail": ""
-        },
-        {
-          "title": "Instancing arrives in the Persistent Universe: players and parties get private spaces for ",
-          "detail": ""
+          "title": "New Vehicle Purchases and Variants",
+          "detail": "Adds the Kruger L-22 Alphawolf, MISC Hull B, Drake Golem OX, and GRIN UTV to in-game dealerships, replaces the RSI Aurora Mk I with the Mk II in shops, and grants the Kruger P-52 Merlin an editable center gimbal mount."
         }
       ],
       "fixes": [
         {
-          "title": "Hauling and cargo contracts",
-          "detail": "Fixed missing mission cargo, freight elevator kiosk issues, missions without cooldown, and zone requests in multi-location hauling contracts."
+          "title": "Cargo and Freight Elevators",
+          "detail": "Fixed multiple issues causing missing cargo on terminals, platform freezes on the Transferring screen, and greyed-out claim buttons."
         },
         {
-          "title": "Bounty and combat contracts",
-          "detail": "Fixed hostiles not spawning in Pyro outposts and surface encounters, security patrol progress, Expel Outlaws completion, and friendly NPCs despawning in bunker defenses."
+          "title": "Mission AI and Hostile Spawns",
+          "detail": "Corrected bugs preventing hostile and target spawns in Eliminate All, Expel Outlaws, planetary bounties, and Vanduul encounters."
         },
         {
-          "title": "Escort and ship battle contracts",
-          "detail": "Fixed hangar doors not opening for escort ships, escorted ship not flying away, missing escorted ships, and wrong faction reputation from Foxwell and Hurston battles."
+          "title": "Escort and Refueling Missions",
+          "detail": "Resolved broken objectives, uncooperative escort ships failing to quantum or enter hangars, and docking request failures during refueling runs."
         },
         {
-          "title": "Tactical Strike Group",
-          "detail": "Fixed Vanduul fighters not spawning, dormant Scythes, missions stalling at Go To, turret firing angles, and missing 60-minute cooldown."
+          "title": "Hangar Life Support and Ship Power",
+          "detail": "Fixed hangar suffocation with active ship life support, as well as unresponsive powerplants on stored and retrieved Drake Ironclad, Ironclad Assault, and Caterpillar ships."
         },
         {
-          "title": "Refuelling contracts",
-          "detail": "Fixed the Refuel Request objective progression, docking request acceptance, shooting the target not failing the mission, and missing audio from the mission giver."
-        },
-        {
-          "title": "Mining and industrial contracts",
-          "detail": "Fixed Industrial Resource Gathering not completing if a party member delivered the item, and scan/mine markers appearing incorrectly."
-        },
-        {
-          "title": "Investigation and delving",
-          "detail": "Fixed misdirected mission objectives, card/drive rejects at freight elevators, and unusable transit elevators blocking progress."
-        },
-        {
-          "title": "Creature contracts",
-          "detail": "Fixed the Highpoint Wilderness intro mission stuck active and Valakkar not emerging from the ground after egg placement."
+          "title": "Client and Engine Stability",
+          "detail": "Resolved 20 client crashes, 20 server crashes, threading/memory errors, and physics stalls to improve overall client performance and streaming."
         }
       ],
       "knownIssues": [],
-      "whoItAffects": [],
+      "whoItAffects": [
+        "Combat and FPS players participating in the updated Siege of Orison or using the new super-heavy loadouts.",
+        "Industrial players and miners taking contracts from Recco Battaglia or managing cargo persistence.",
+        "Pilots navigating changes to vehicle armor health, Size 4 ballistic weapons, fuel consumption, and higher operating cost",
+        "VR users utilizing experimental head tracking, stereo cursor updates, and OpenXR 1.1.60 improvements."
+      ],
       "watchouts": [
-        "Always save your ship loadout before heading out.",
-        "Siege of Orison is a 4-player instanced mission: party leader is the instance owner and entry checks apply.",
-        "The new super-heavy armor and Vendetta magazines/loot only come through Wikelo exchanges or Siege of Orison. The H4-PBF ammo backpack can only store the new Magna ammo, and must be",
-        "Hydrogen/quantum fuel prices are significantly higher.",
-        "Instanced hall that if it cannot be created, you'll get a banner rather than a silent fail.",
-        "Wikelo's hangar cannot store ships; if you choose 'Now' your ship will be sent home, and if you leave anything in the hangar it will be returned automatically."
+        "Vehicle armor sitting at zero health no longer mitigates incoming damage.",
+        "Quantum and hydrogen fuel prices have substantially increased alongside reduced tank capacities.",
+        "Ship claim timers scale by value, expediting costs more, and ordnance/bomb restock prices are sharply higher.",
+        "Only cargo and ore containers acquired after 4.10 will persist in Long Term Persistence; stock ship ore pods do not persist contained ore.",
+        "Vehicles left in Wikelo's hangar cannot be stored there and will be returned to your home hangar."
       ]
     },
-    "model": "deepseek/deepseek-v4-flash-0731",
-    "at": "2026-09-04T04:06:58.569Z"
+    "model": "gemini-3.8-flash",
+    "primaryModel": "gemini-3.8-flash",
+    "at": "2026-09-08T03:58:57.561Z"
   },
   "4.9.0": {
     "hash": "2d2d1b6fb4544485acae5f92",

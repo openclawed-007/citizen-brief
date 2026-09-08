@@ -34,7 +34,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Patch briefings are generated during harvest from the source notes using Google's Gemini API (`gemini-3.8-flash`). Use a Google AI Studio key from a free-tier project as `GEMINI_API_KEY` in `.env.local` and the GitHub Actions repository secrets. The API uses the key's project billing tier; code cannot turn a paid project into a free one.
 
-Set `OPENROUTER_API_KEY` for fallback through `openrouter/free`, which selects currently available free models supporting JSON output. Each provider has one 30-second attempt. Errors, quota limits, invalid JSON and truncated output trigger fallback; if both fail, the last good summary is preserved. Visitors never call either provider and keys stay out of the browser.
+Set `OPENROUTER_API_KEY` for fallback through `google/gemma-4-31b-it:free`, then `openrouter/free`, which selects currently available free models supporting JSON output. Each model has one 30-second attempt. Errors, quota limits, invalid JSON and truncated output trigger fallback; if all fail, the last good summary is preserved. Visitors never call either provider and keys stay out of the browser.
 
 Briefs are cached by source hash and model policy in `data/briefs.json`, with GitHub Actions preserving that cache between deployments. A model change regenerates old briefs, and adding the Gemini key upgrades fallback briefs on the next harvest. Static page workers read the harvested briefs without making extra AI calls.
 

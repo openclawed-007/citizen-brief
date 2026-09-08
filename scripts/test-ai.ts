@@ -45,7 +45,11 @@ test("AI provider routing and honest status labels", async () => {
       assert.equal(requests[1].body.model, FALLBACK_MODEL);
       assert.equal(requests[1].headers.has("x-goog-api-key"), false);
     }
-    responses = [new Response(null, { status: 503 }), Response.json({ choices: [] })];
+    requests.length = 0;
+    responses = [new Response(null, { status: 503 }), Response.json({ choices: [] }), free()];
+    assert.equal((await requestBrief("test", "Title", "Notes"))?.fallback, true);
+    assert.equal(requests[2].body.model, "openrouter/free", "Free router is used if the preferred free model fails");
+    responses = [new Response(null, { status: 503 }), Response.json({ choices: [] }), Response.json({ choices: [] })];
     assert.equal(await requestBrief("test", "Title", "Notes"), null);
     process.env.GEMINI_API_KEY = "";
     requests.length = 0;
